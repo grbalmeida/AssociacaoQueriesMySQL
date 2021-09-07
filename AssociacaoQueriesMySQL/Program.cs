@@ -1,5 +1,6 @@
 ﻿using AssociacaoQueriesMySQL.Database;
 using AssociacaoQueriesMySQL.Extensions;
+using AssociacaoQueriesMySQL.Menus;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -32,7 +33,7 @@ namespace AssociacaoQueriesMySQL
             var opcoes = new Dictionary<string, Action>
             {
                 { "1", UsuariosMenu },
-                { "2", ClientesMenu },
+                { "2", () => ClientesMenu.Iniciar(ExibirMenuInicial, _connectionString) },
                 { "3", CategoriasMenu }
             };
 
@@ -51,25 +52,6 @@ namespace AssociacaoQueriesMySQL
             {
                 { "1", ListarUsuarios },
                 { "3", RemoverUsuario }
-            };
-
-            opcoes.ExecutarOpcao(opcao, ExibirMenuInicial);
-        }
-
-        static void ClientesMenu()
-        {
-            Console.Clear();
-            Console.WriteLine("1 - Listar Clientes");
-            Console.WriteLine("2 - Inserir Cliente");
-            Console.WriteLine("3 - Remover Cliente");
-
-            var opcao = Console.ReadLine();
-
-            var opcoes = new Dictionary<string, Action>
-            {
-                { "1", ListarClientes },
-                { "2", InserirCliente },
-                { "3", RemoverCliente }
             };
 
             opcoes.ExecutarOpcao(opcao, ExibirMenuInicial);
@@ -94,17 +76,6 @@ namespace AssociacaoQueriesMySQL
             opcoes.ExecutarOpcao(opcao, ExibirMenuInicial);
         }
 
-        static void ListarClientes()
-        {
-            Console.Clear();
-
-            using var db = new ClienteRepositorio(_connectionString);
-            db.Listar();
-
-            Console.ReadKey();
-            ClientesMenu();
-        }
-
         static void ListarUsuarios()
         {
             Console.Clear();
@@ -125,39 +96,6 @@ namespace AssociacaoQueriesMySQL
 
             Console.ReadKey();
             CategoriasMenu();
-        }
-
-        static void InserirCliente()
-        {
-            Console.Clear();
-            Console.Write("Informe o Nome: ");
-            var nome = Console.ReadLine();
-            Console.Write("Informe o Documento: ");
-            var documento = Console.ReadLine();
-            Console.Write("Informe o Email: ");
-            var email = Console.ReadLine();
-            Console.Write("Informe a Data Nascimento - (yyyy-mm-dd): ");
-            var dataNascimento = Console.ReadLine();
-            Console.Write("Informe o Endereço: ");
-            var endereco = Console.ReadLine();
-            Console.Write("Informe a Cidade: ");
-            var cidade = Console.ReadLine();
-            Console.Write("Informe o Estado: ");
-            var estado = Console.ReadLine();
-            Console.Write("Informe o País: ");
-            var pais = Console.ReadLine();
-            Console.Write("Informe o CEP: ");
-            var cep = Console.ReadLine();
-            Console.Write("Informe o Fone: ");
-            var fone = Console.ReadLine();
-            Console.Write("Informe a Imagem: ");
-            var imagem = Console.ReadLine();
-
-            using var db = new ClienteRepositorio(_connectionString);
-            db.Inserir(nome, documento, email, dataNascimento, endereco, cidade, estado, pais, cep, fone, imagem);
-
-            Console.ReadKey();
-            ClientesMenu();
         }
 
         static void InserirCategoria()
@@ -186,19 +124,6 @@ namespace AssociacaoQueriesMySQL
 
             Console.ReadKey();
             CategoriasMenu();
-        }
-
-        static void RemoverCliente()
-        {
-            Console.Clear();
-            Console.Write("Informe o Id: ");
-            var id = Convert.ToInt32(Console.ReadLine());
-
-            using var db = new ClienteRepositorio(_connectionString);
-            db.Remover(id);
-
-            Console.ReadKey();
-            ClientesMenu();
         }
 
         static void RemoverUsuario()
