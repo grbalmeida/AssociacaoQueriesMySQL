@@ -34,68 +34,10 @@ namespace AssociacaoQueriesMySQL
             {
                 { "1", () => UsuariosMenu.Iniciar(ExibirMenuInicial, _connectionString) },
                 { "2", () => ClientesMenu.Iniciar(ExibirMenuInicial, _connectionString) },
-                { "3", CategoriasMenu }
+                { "3", () => CategoriasMenu.Iniciar(ExibirMenuInicial, _connectionString) }
             };
 
             opcoes.ExecutarOpcao(opcao, ExibirMenuInicial);
-        }
-
-        static void CategoriasMenu()
-        {
-            Console.Clear();
-            Console.WriteLine("1 - Listar Categorias");
-            Console.WriteLine("2 - Inserir Categoria");
-            Console.WriteLine("3 - Remover Categoria");
-
-            var opcao = Console.ReadLine();
-
-            var opcoes = new Dictionary<string, Action>
-            {
-                { "1", ListarCategorias },
-                { "2", InserirCategoria },
-                { "3", RemoverCategoria }
-            };
-
-            opcoes.ExecutarOpcao(opcao, ExibirMenuInicial);
-        }
-
-        static void ListarCategorias()
-        {
-            Console.Clear();
-
-            using var db = new CategoriaRepositorio(_connectionString);
-            db.Listar();
-
-            Console.ReadKey();
-            CategoriasMenu();
-        }
-
-        static void InserirCategoria()
-        {
-            Console.Clear();
-            Console.Write("Informe o Id: ");
-            var id = Convert.ToInt32(Console.ReadLine());
-            Console.Write("Informe o Nome: ");
-            var nome = Console.ReadLine();
-
-            using var db = new CategoriaRepositorio(_connectionString);
-            db.Inserir(id, nome);
-
-            Console.ReadKey();
-            CategoriasMenu();
-        }
-
-        static void RemoverCategoria()
-        {
-            Console.Clear();
-            Console.Write("Informe o Id: ");
-            var id = Convert.ToInt32(Console.ReadLine());
-
-            using var db = new CategoriaRepositorio(_connectionString);
-            db.Remover(id);
-
-            Console.ReadKey();
-            CategoriasMenu();
         }
 
         static void CriarTabelas()
