@@ -43,12 +43,14 @@ namespace AssociacaoQueriesMySQL
         {
             Console.Clear();
             Console.WriteLine("1 - Listar Usuários");
+            Console.WriteLine("3 - Remover Usuário");
 
             var opcao = Console.ReadLine();
 
             var opcoes = new Dictionary<string, Action>
             {
                 { "1", ListarUsuarios },
+                { "3", RemoverUsuario }
             };
 
             opcoes.ExecutarOpcao(opcao, ExibirMenuInicial);
@@ -197,6 +199,19 @@ namespace AssociacaoQueriesMySQL
 
             Console.ReadKey();
             ClientesMenu();
+        }
+
+        static void RemoverUsuario()
+        {
+            Console.Clear();
+            Console.Write("Informe o Id: ");
+            var id = Convert.ToInt32(Console.ReadLine());
+
+            using var db = new UsuarioRepositorio(_connectionString);
+            db.Remover(id);
+
+            Console.ReadKey();
+            UsuariosMenu();
         }
 
         static void CriarTabelas()

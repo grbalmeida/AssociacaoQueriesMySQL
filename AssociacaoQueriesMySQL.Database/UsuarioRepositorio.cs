@@ -61,6 +61,27 @@ namespace AssociacaoQueriesMySQL.Database
             reader.Dispose();
         }
 
+        public void Remover(int id)
+        {
+            var cmdText = "DELETE FROM Usuario WHERE Id = @Id";
+
+            MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+            comando.Parameters.Add(new MySqlParameter("Id", id));
+
+            var linhasAfetadas = comando.ExecuteNonQuery();
+
+            if (linhasAfetadas > 0)
+            {
+                Console.WriteLine("Usuário excluído com sucesso");
+            }
+            else
+            {
+                Console.WriteLine("Usuário não existe");
+            }
+
+            comando.Dispose();
+        }
+
         public void Dispose()
         {
             _conexao?.Dispose();
