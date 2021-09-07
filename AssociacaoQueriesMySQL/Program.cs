@@ -59,13 +59,15 @@ namespace AssociacaoQueriesMySQL
             Console.Clear();
             Console.WriteLine("1 - Listar Clientes");
             Console.WriteLine("2 - Inserir Cliente");
+            Console.WriteLine("3 - Remover Cliente");
 
             var opcao = Console.ReadLine();
 
             var opcoes = new Dictionary<string, Action>
             {
                 { "1", ListarClientes },
-                { "2", InserirCliente }
+                { "2", InserirCliente },
+                { "3", RemoverCliente }
             };
 
             opcoes.ExecutarOpcao(opcao, ExibirMenuInicial);
@@ -182,6 +184,19 @@ namespace AssociacaoQueriesMySQL
 
             Console.ReadKey();
             CategoriasMenu();
+        }
+
+        static void RemoverCliente()
+        {
+            Console.Clear();
+            Console.Write("Informe o Id: ");
+            var id = Convert.ToInt32(Console.ReadLine());
+
+            using var db = new ClienteRepositorio(_connectionString);
+            db.Remover(id);
+
+            Console.ReadKey();
+            ClientesMenu();
         }
 
         static void CriarTabelas()

@@ -132,6 +132,27 @@ namespace AssociacaoQueriesMySQL.Database
             comando.Dispose();
         }
 
+        public void Remover(int id)
+        {
+            var cmdText = "DELETE FROM Cliente WHERE Id = @Id";
+
+            MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+            comando.Parameters.Add(new MySqlParameter("Id", id));
+
+            var linhasAfetadas = comando.ExecuteNonQuery();
+
+            if (linhasAfetadas > 0)
+            {
+                Console.WriteLine("Cliente excluído com sucesso");
+            }
+            else
+            {
+                Console.WriteLine("Cliente não existe");
+            }
+
+            comando.Dispose();
+        }
+
         public void Dispose()
         {
             _conexao?.Dispose();
