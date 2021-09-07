@@ -32,26 +32,9 @@ namespace AssociacaoQueriesMySQL
 
             var opcoes = new Dictionary<string, Action>
             {
-                { "1", UsuariosMenu },
+                { "1", () => UsuariosMenu.Iniciar(ExibirMenuInicial, _connectionString) },
                 { "2", () => ClientesMenu.Iniciar(ExibirMenuInicial, _connectionString) },
                 { "3", CategoriasMenu }
-            };
-
-            opcoes.ExecutarOpcao(opcao, ExibirMenuInicial);
-        }
-
-        static void UsuariosMenu()
-        {
-            Console.Clear();
-            Console.WriteLine("1 - Listar Usuários");
-            Console.WriteLine("3 - Remover Usuário");
-
-            var opcao = Console.ReadLine();
-
-            var opcoes = new Dictionary<string, Action>
-            {
-                { "1", ListarUsuarios },
-                { "3", RemoverUsuario }
             };
 
             opcoes.ExecutarOpcao(opcao, ExibirMenuInicial);
@@ -74,17 +57,6 @@ namespace AssociacaoQueriesMySQL
             };
 
             opcoes.ExecutarOpcao(opcao, ExibirMenuInicial);
-        }
-
-        static void ListarUsuarios()
-        {
-            Console.Clear();
-
-            using var db = new UsuarioRepositorio(_connectionString);
-            db.Listar();
-
-            Console.ReadKey();
-            UsuariosMenu();
         }
 
         static void ListarCategorias()
@@ -126,22 +98,8 @@ namespace AssociacaoQueriesMySQL
             CategoriasMenu();
         }
 
-        static void RemoverUsuario()
-        {
-            Console.Clear();
-            Console.Write("Informe o Id: ");
-            var id = Convert.ToInt32(Console.ReadLine());
-
-            using var db = new UsuarioRepositorio(_connectionString);
-            db.Remover(id);
-
-            Console.ReadKey();
-            UsuariosMenu();
-        }
-
         static void CriarTabelas()
         {
-            
             using var db = new InicializarTabelas(_connectionString);
 
             Console.Clear();
