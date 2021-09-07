@@ -128,6 +128,8 @@ namespace AssociacaoQueriesMySQL.Database
                     if (e.Message.Contains("DataNascimento")) Console.WriteLine("Data Nascimento em formato inválido");
                 }
             }
+
+            comando.Dispose();
         }
 
         public void Dispose()

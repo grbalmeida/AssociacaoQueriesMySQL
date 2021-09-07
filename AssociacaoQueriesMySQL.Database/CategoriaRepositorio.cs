@@ -72,7 +72,30 @@ namespace AssociacaoQueriesMySQL.Database
                     else if (e.Message.Contains("Nome")) Console.WriteLine("Nome já cadastrado");
                 }
             }
+
+            comando.Dispose();
         }
+
+        public void Remover(int id)
+        {
+            var cmdText = "DELETE FROM Categoria WHERE Id = @Id";
+
+            MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+            comando.Parameters.Add(new MySqlParameter("Id", id));
+
+            var linhasAfetadas = comando.ExecuteNonQuery();
+
+            if (linhasAfetadas > 0)
+            {
+                Console.WriteLine("Categoria excluída com sucesso");
+            }
+            else
+            {
+                Console.WriteLine("Categoria não existe");
+            }
+
+            comando.Dispose();
+        } 
 
         public void Dispose()
         {
