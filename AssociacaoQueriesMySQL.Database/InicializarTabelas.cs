@@ -16,6 +16,7 @@ namespace AssociacaoQueriesMySQL.Database
             InicializarTabelaUsuario();
             InicializarTabelaCliente();
             InicializarTabelaCategoria();
+            InicializarTabelaProduto();
         }
 
         private void InicializarTabelaUsuario()
@@ -83,6 +84,33 @@ namespace AssociacaoQueriesMySQL.Database
             sql.AppendLine("  Id INT NOT NULL UNIQUE,");
             sql.AppendLine("  Nome VARCHAR(100) UNIQUE,");
             sql.AppendLine("  PRIMARY KEY(Id)");
+            sql.AppendLine(");");
+
+            var cmdText = sql.ToString();
+
+            MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+
+            comando.ExecuteNonQuery();
+            comando.Dispose();
+        }
+
+        private void InicializarTabelaProduto()
+        {
+            var sql = new StringBuilder();
+
+            sql.AppendLine("CREATE TABLE IF NOT EXISTS Produto (");
+            sql.AppendLine("  Id INT NOT NULL AUTO_INCREMENT,");
+            sql.AppendLine("  Nome VARCHAR(100) NOT NULL,");
+            sql.AppendLine("  Descricao TEXT,");
+            sql.AppendLine("  Ativo BIT NOT NULL,");
+            sql.AppendLine("  Valor DECIMAL(10, 2) NOT NULL,");
+            sql.AppendLine("  CategoriaId INT NOT NULL,");
+            sql.AppendLine("  QuantidadeEstoque INT NOT NULL,");
+            sql.AppendLine("  Altura DECIMAL(4, 2) NOT NULL,");
+            sql.AppendLine("  Largura DECIMAL(4, 2) NOT NULL,");
+            sql.AppendLine("  Profundidade DECIMAL(4, 2) NOT NULL,");
+            sql.AppendLine("  PRIMARY KEY(Id),");
+            sql.AppendLine("  CONSTRAINT FK_Categoria FOREIGN KEY(CategoriaId) REFERENCES Categoria(Id)");
             sql.AppendLine(");");
 
             var cmdText = sql.ToString();

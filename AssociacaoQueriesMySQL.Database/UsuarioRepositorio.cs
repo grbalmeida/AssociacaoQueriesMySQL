@@ -117,7 +117,7 @@ namespace AssociacaoQueriesMySQL.Database
                 if (e.Number == (int)MySqlErrorCode.DataTooLong)
                 {
                     if (e.Message.Contains("Nome")) Console.WriteLine("O Nome deve possuir no máximo 100 caracteres");
-                    else if (e.Message.Contains("Documento")) Console.WriteLine("O Documento deve possuir no máximo 20 caracteres");
+                    else if (e.Message.Contains("CPF")) Console.WriteLine("O CPF deve possuir no máximo 11 caracteres");
                     else if (e.Message.Contains("Email")) Console.WriteLine("O Email deve possuir no máximo 100 caracteres");
                     else if (e.Message.Contains("Senha")) Console.WriteLine("A Senha deve possuir no máximo 100 caracteres");
                     else if (e.Message.Contains("Endereco")) Console.WriteLine("O Endereço deve possuir no máximo 100 caracteres");
