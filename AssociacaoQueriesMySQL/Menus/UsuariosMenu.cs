@@ -22,6 +22,7 @@ namespace AssociacaoQueriesMySQL.Menus
 
             Console.Clear();
             Console.WriteLine("1 - Listar Usuários");
+            Console.WriteLine("2 - Inserir Usuário");
             Console.WriteLine("3 - Remover Usuário");
 
             var opcao = Console.ReadLine();
@@ -29,6 +30,7 @@ namespace AssociacaoQueriesMySQL.Menus
             var opcoes = new Dictionary<string, Action>
             {
                 { "1", Listar },
+                { "2", Inserir },
                 { "3", Remover }
             };
 
@@ -41,6 +43,43 @@ namespace AssociacaoQueriesMySQL.Menus
 
             using var db = new UsuarioRepositorio(_connectionString);
             db.Listar();
+            db.Dispose();
+
+            Console.ReadKey();
+            Iniciar();
+        }
+
+        private static void Inserir()
+        {
+            Console.Clear();
+            Console.Write("Informe o Nome: ");
+            var nome = Console.ReadLine();
+            Console.Write("Informe o CPF: ");
+            var cpf = Console.ReadLine();
+            Console.Write("Informe o Email: ");
+            var email = Console.ReadLine();
+            Console.Write("Informe a Data Nascimento - (yyyy-mm-dd): ");
+            var dataNascimento = Console.ReadLine();
+            Console.Write("Informe a Senha: ");
+            var senha = PasswordExtensions.ReadPassword();
+            Console.WriteLine();
+            Console.Write("Informe o Endereço: ");
+            var endereco = Console.ReadLine();
+            Console.Write("Informe a Cidade: ");
+            var cidade = Console.ReadLine();
+            Console.Write("Informe o Estado: ");
+            var estado = Console.ReadLine();
+            Console.Write("Informe o País: ");
+            var pais = Console.ReadLine();
+            Console.Write("Informe o CEP: ");
+            var cep = Console.ReadLine();
+            Console.Write("Informe o Fone: ");
+            var fone = Console.ReadLine();
+            Console.Write("Informe a Imagem: ");
+            var imagem = Console.ReadLine();
+
+            using var db = new UsuarioRepositorio(_connectionString);
+            db.Inserir(nome, cpf, email, senha, dataNascimento, endereco, cidade, estado, pais, cep, fone, imagem);
             db.Dispose();
 
             Console.ReadKey();
