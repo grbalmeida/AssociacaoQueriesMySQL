@@ -83,15 +83,25 @@ namespace AssociacaoQueriesMySQL.Database
             MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
             comando.Parameters.Add(new MySqlParameter("Id", id));
 
-            var linhasAfetadas = comando.ExecuteNonQuery();
+            try
+            {
+                var linhasAfetadas = comando.ExecuteNonQuery();
 
-            if (linhasAfetadas > 0)
-            {
-                Console.WriteLine("Categoria excluída com sucesso");
+                if (linhasAfetadas > 0)
+                {
+                    Console.WriteLine("Categoria excluída com sucesso");
+                }
+                else
+                {
+                    Console.WriteLine("Categoria não existe");
+                }
             }
-            else
+            catch (MySqlException e)
             {
-                Console.WriteLine("Categoria não existe");
+                if (e.Number == (int)MySqlErrorCode.RowIsReferenced2)
+                {
+                    Console.WriteLine("Não é possível excluir essa categoria pois existem produtos associados a ela");
+                }
             }
 
             comando.Dispose();
