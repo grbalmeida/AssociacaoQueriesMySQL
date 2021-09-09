@@ -35,7 +35,7 @@ namespace AssociacaoQueriesMySQL.Database
             }
             else
             {
-                Console.WriteLine("Nenhuma categoria cadastrada");
+                ConsoleExtensions.Warning("Nenhuma categoria cadastrada");
                 Console.WriteLine();
             }
 
@@ -57,19 +57,19 @@ namespace AssociacaoQueriesMySQL.Database
 
                 if (linhasAfetadas > 0)
                 {
-                    Console.WriteLine("Categoria inserida com sucesso");
+                    ConsoleExtensions.Success("Categoria inserida com sucesso");
                 }
             }
             catch (MySqlException e)
             {
                 if (e.Number == (int)MySqlErrorCode.DataTooLong)
                 {
-                    if (e.Message.Contains("Nome")) Console.WriteLine("O Nome deve possuir no máximo 100 caracteres");
+                    if (e.Message.Contains("Nome")) ConsoleExtensions.Error("O Nome deve possuir no máximo 100 caracteres");
                 }
                 else if (e.Number == (int)MySqlErrorCode.DuplicateKeyEntry)
                 {
-                    if (e.Message.Contains("PRIMARY")) Console.WriteLine("Id já cadastrado");
-                    else if (e.Message.Contains("Nome")) Console.WriteLine("Nome já cadastrado");
+                    if (e.Message.Contains("PRIMARY")) ConsoleExtensions.Error("Id já cadastrado");
+                    else if (e.Message.Contains("Nome")) ConsoleExtensions.Error("Nome já cadastrado");
                 }
             }
 
@@ -89,18 +89,18 @@ namespace AssociacaoQueriesMySQL.Database
 
                 if (linhasAfetadas > 0)
                 {
-                    Console.WriteLine("Categoria excluída com sucesso");
+                    ConsoleExtensions.Success("Categoria excluída com sucesso");
                 }
                 else
                 {
-                    Console.WriteLine("Categoria não existe");
+                    ConsoleExtensions.Warning("Categoria não existe");
                 }
             }
             catch (MySqlException e)
             {
                 if (e.Number == (int)MySqlErrorCode.RowIsReferenced2)
                 {
-                    Console.WriteLine("Não é possível excluir essa categoria pois existem produtos associados a ela");
+                    ConsoleExtensions.Error("Não é possível excluir essa categoria pois existem produtos associados a ela");
                 }
             }
 

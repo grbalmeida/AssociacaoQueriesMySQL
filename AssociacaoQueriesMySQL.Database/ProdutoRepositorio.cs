@@ -58,7 +58,7 @@ namespace AssociacaoQueriesMySQL.Database
             }
             else
             {
-                Console.WriteLine("Nenhum produto cadastrado");
+                ConsoleExtensions.Warning("Nenhum produto cadastrado");
                 Console.WriteLine();
             }
 
@@ -103,14 +103,14 @@ namespace AssociacaoQueriesMySQL.Database
 
                 if (linhasAfetadas > 0)
                 {
-                    Console.WriteLine("Produto inserido com sucesso");
+                    ConsoleExtensions.Success("Produto inserido com sucesso");
                 }
             }
             catch (MySqlException e)
             {
                 if (e.Number == (int)MySqlErrorCode.DataTooLong)
                 {
-                    if (e.Message.Contains("Nome")) Console.WriteLine("O Nome deve possuir no máximo 100 caracteres");
+                    if (e.Message.Contains("Nome")) ConsoleExtensions.Error("O Nome deve possuir no máximo 100 caracteres");
                 }
             }
 
@@ -128,11 +128,11 @@ namespace AssociacaoQueriesMySQL.Database
 
             if (linhasAfetadas > 0)
             {
-                Console.WriteLine("Produto excluído com sucesso");
+                ConsoleExtensions.Success("Produto excluído com sucesso");
             }
             else
             {
-                Console.WriteLine("Produto não existe");
+                ConsoleExtensions.Warning("Produto não existe");
             }
 
             comando.Dispose();

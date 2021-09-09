@@ -54,7 +54,7 @@ namespace AssociacaoQueriesMySQL.Database
             }
             else
             {
-                Console.WriteLine("Nenhum cliente cadastrado");
+                ConsoleExtensions.Warning("Nenhum cliente cadastrado");
                 Console.WriteLine();
             }
 
@@ -105,27 +105,27 @@ namespace AssociacaoQueriesMySQL.Database
 
                 if (linhasAfetadas > 0)
                 {
-                    Console.WriteLine("Cliente inserido com sucesso");
+                    ConsoleExtensions.Success("Cliente inserido com sucesso");
                 }
             }
             catch(MySqlException e)
             {
                 if (e.Number == (int)MySqlErrorCode.DataTooLong)
                 {
-                    if (e.Message.Contains("Nome")) Console.WriteLine("O Nome deve possuir no máximo 100 caracteres");
-                    else if (e.Message.Contains("Documento")) Console.WriteLine("O Documento deve possuir no máximo 20 caracteres");
-                    else if (e.Message.Contains("Email")) Console.WriteLine("O Email deve possuir no máximo 100 caracteres");
-                    else if (e.Message.Contains("Endereco")) Console.WriteLine("O Endereço deve possuir no máximo 100 caracteres");
-                    else if (e.Message.Contains("Cidade")) Console.WriteLine("A Cidade deve possuir no máximo 100 caracteres");
-                    else if (e.Message.Contains("Estado")) Console.WriteLine("O Estado deve possuir no máximo 2 caracteres");
-                    else if (e.Message.Contains("Pais")) Console.WriteLine("O País deve possuir no máximo 100 caracteres");
-                    else if (e.Message.Contains("CEP")) Console.WriteLine("O CEP deve possuir no máximo 100 caracteres");
-                    else if (e.Message.Contains("Fone")) Console.WriteLine("O Fone deve possuir no máximo 20 caracteres");
-                    else if (e.Message.Contains("Imagem")) Console.WriteLine("A imagem deve possuir no máximo 100 caracteres");
+                    if (e.Message.Contains("Nome")) ConsoleExtensions.Error("O Nome deve possuir no máximo 100 caracteres");
+                    else if (e.Message.Contains("Documento")) ConsoleExtensions.Error("O Documento deve possuir no máximo 20 caracteres");
+                    else if (e.Message.Contains("Email")) ConsoleExtensions.Error("O Email deve possuir no máximo 100 caracteres");
+                    else if (e.Message.Contains("Endereco")) ConsoleExtensions.Error("O Endereço deve possuir no máximo 100 caracteres");
+                    else if (e.Message.Contains("Cidade")) ConsoleExtensions.Error("A Cidade deve possuir no máximo 100 caracteres");
+                    else if (e.Message.Contains("Estado")) ConsoleExtensions.Error("O Estado deve possuir no máximo 2 caracteres");
+                    else if (e.Message.Contains("Pais")) ConsoleExtensions.Error("O País deve possuir no máximo 100 caracteres");
+                    else if (e.Message.Contains("CEP")) ConsoleExtensions.Error("O CEP deve possuir no máximo 100 caracteres");
+                    else if (e.Message.Contains("Fone")) ConsoleExtensions.Error("O Fone deve possuir no máximo 20 caracteres");
+                    else if (e.Message.Contains("Imagem")) ConsoleExtensions.Error("A imagem deve possuir no máximo 100 caracteres");
                 }
                 else if (e.Number == (int)MySqlErrorCode.TruncatedWrongValue)
                 {
-                    if (e.Message.Contains("DataNascimento")) Console.WriteLine("Data Nascimento em formato inválido");
+                    if (e.Message.Contains("DataNascimento")) ConsoleExtensions.Error("Data Nascimento em formato inválido");
                 }
             }
 
@@ -143,11 +143,11 @@ namespace AssociacaoQueriesMySQL.Database
 
             if (linhasAfetadas > 0)
             {
-                Console.WriteLine("Cliente excluído com sucesso");
+                ConsoleExtensions.Success("Cliente excluído com sucesso");
             }
             else
             {
-                Console.WriteLine("Cliente não existe");
+                ConsoleExtensions.Warning("Cliente não existe");
             }
 
             comando.Dispose();
