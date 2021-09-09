@@ -23,13 +23,15 @@ namespace AssociacaoQueriesMySQL.Menus
             Console.Clear();
             Console.WriteLine("1 - Listar Produtos");
             Console.WriteLine("2 - Inserir Produto");
+            Console.WriteLine("3 - Remover Produto");
 
             var opcao = Console.ReadLine();
 
             var opcoes = new Dictionary<string, Action>
             {
                 { "1", Listar },
-                { "2", Inserir }
+                { "2", Inserir },
+                { "3", Remover }
             };
 
             opcoes.ExecutarOpcao(opcao, _menuInicial);
@@ -72,6 +74,20 @@ namespace AssociacaoQueriesMySQL.Menus
 
             using var db = new ProdutoRepositorio(_connectionString);
             db.Inserir(nome, descricao, ativo.Equals("S"), valor, categoriaId, quantidadeEstoque, altura, largura, profundidade);
+            db.Dispose();
+
+            Console.ReadKey();
+            Iniciar();
+        }
+
+        private static void Remover()
+        {
+            Console.Clear();
+            Console.Write("Informe o Id: ");
+            var id = Convert.ToInt32(Console.ReadLine());
+
+            using var db = new ProdutoRepositorio(_connectionString);
+            db.Remover(id);
             db.Dispose();
 
             Console.ReadKey();
