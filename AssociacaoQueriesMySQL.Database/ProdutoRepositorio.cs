@@ -66,6 +66,56 @@ namespace AssociacaoQueriesMySQL.Database
             reader.Dispose();
         }
 
+        public void Inserir(
+            string nome,
+            string descricao,
+            bool ativo,
+            decimal valor,
+            int categoriaId,
+            int quantidadeEstoque,
+            decimal altura,
+            decimal largura,
+            decimal profundidade
+        )
+        {
+            var sql = new StringBuilder();
+            sql.AppendLine("INSERT INTO Produto (Nome, Descricao, Ativo, Valor,");
+            sql.AppendLine("CategoriaId, QuantidadeEstoque, Altura, Largura, Profundidade)");
+            sql.AppendLine("VALUES (@Nome, @Descricao, @Ativo, @Valor, @CategoriaId,");
+            sql.AppendLine("@QuantidadeEstoque, @Altura, @Largura, @Profundidade)");
+
+            var cmdText = sql.ToString();
+
+            MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+            comando.Parameters.Add(new MySqlParameter("Nome", nome));
+            comando.Parameters.Add(new MySqlParameter("Descricao", descricao));
+            comando.Parameters.Add(new MySqlParameter("Ativo", ativo));
+            comando.Parameters.Add(new MySqlParameter("Valor", valor));
+            comando.Parameters.Add(new MySqlParameter("CategoriaId", categoriaId));
+            comando.Parameters.Add(new MySqlParameter("QuantidadeEstoque", quantidadeEstoque));
+            comando.Parameters.Add(new MySqlParameter("Altura", altura));
+            comando.Parameters.Add(new MySqlParameter("Largura", largura));
+            comando.Parameters.Add(new MySqlParameter("Profundidade", profundidade));
+
+            try
+            {
+                var linhasAfetadas = comando.ExecuteNonQuery();
+
+                if (linhasAfetadas > 0)
+                {
+                    Console.WriteLine("Produto inserido com sucesso");
+                }
+            }
+            catch (MySqlException e)
+            {
+                if (e.Number == (int)MySqlErrorCode.DataTooLong)
+                {
+                    if (e.Message.Contains("Nome")) Console.WriteLine("O Nome deve possuir no máximo 100 caracteres");
+                }
+            }
+
+        }
+
         public void Dispose()
         {
             _conexao?.Dispose();
