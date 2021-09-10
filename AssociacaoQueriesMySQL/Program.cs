@@ -27,6 +27,7 @@ namespace AssociacaoQueriesMySQL
             Console.WriteLine("2 - Clientes");
             Console.WriteLine("3 - Categorias");
             Console.WriteLine("4 - Produtos");
+            Console.WriteLine("5 - Empréstimos");
             Console.WriteLine();
 
             var opcao = Console.ReadLine();
@@ -36,7 +37,8 @@ namespace AssociacaoQueriesMySQL
                 { "1", () => UsuariosMenu.Iniciar(ExibirMenuInicial, _connectionString) },
                 { "2", () => ClientesMenu.Iniciar(ExibirMenuInicial, _connectionString) },
                 { "3", () => CategoriasMenu.Iniciar(ExibirMenuInicial, _connectionString) },
-                { "4", () => ProdutosMenu.Iniciar(ExibirMenuInicial, _connectionString) }
+                { "4", () => ProdutosMenu.Iniciar(ExibirMenuInicial, _connectionString) },
+                { "5", () => EmprestimosMenu.Iniciar(ExibirMenuInicial, _connectionString) }
             };
 
             opcoes.ExecutarOpcao(opcao, ExibirMenuInicial);
