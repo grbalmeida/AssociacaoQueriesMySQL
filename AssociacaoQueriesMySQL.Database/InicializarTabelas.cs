@@ -17,6 +17,7 @@ namespace AssociacaoQueriesMySQL.Database
             InicializarTabelaCliente();
             InicializarTabelaCategoria();
             InicializarTabelaProduto();
+            InicializarTabelaEmprestimo();
         }
 
         private void InicializarTabelaUsuario()
@@ -111,6 +112,36 @@ namespace AssociacaoQueriesMySQL.Database
             sql.AppendLine("  Profundidade DECIMAL(4, 2) NOT NULL,");
             sql.AppendLine("  PRIMARY KEY(Id),");
             sql.AppendLine("  CONSTRAINT FK_Categoria FOREIGN KEY(CategoriaId) REFERENCES Categoria(Id)");
+            sql.AppendLine(");");
+
+            var cmdText = sql.ToString();
+
+            MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+
+            comando.ExecuteNonQuery();
+            comando.Dispose();
+        }
+
+        private void InicializarTabelaEmprestimo()
+        {
+            var sql = new StringBuilder();
+
+            sql.AppendLine("CREATE TABLE IF NOT EXISTS Emprestimo (");
+            sql.AppendLine("  Id INT NOT NULL AUTO_INCREMENT,");
+            sql.AppendLine("  ProdutoId INT NOT NULL,");
+            sql.AppendLine("  ClienteId INT NOT NULL,");
+            sql.AppendLine("  UsuarioId INT NOT NULL,");
+            sql.AppendLine("  EmprestimoAnteriorId INT,");
+            sql.AppendLine("  DataEmprestimo DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,");
+            sql.AppendLine("  DataLimiteDevolucao DATETIME,");
+            sql.AppendLine("  DataDevolucao DATETIME,");
+            sql.AppendLine("  PRIMARY KEY(Id),");
+            sql.AppendLine("  CONSTRAINT CH_DataLimiteDevolucao CHECK (DataLimiteDevolucao > DataEmprestimo),");
+            sql.AppendLine("  CONSTRAINT CH_DataDevolucao CHECK (DataDevolucao > DataEmprestimo),");
+            sql.AppendLine("  CONSTRAINT FK_Produto FOREIGN KEY(ProdutoId) REFERENCES Produto(Id),");
+            sql.AppendLine("  CONSTRAINT FK_Cliente FOREIGN KEY(ClienteId) REFERENCES Cliente(Id),");
+            sql.AppendLine("  CONSTRAINT FK_Usuario FOREIGN KEY(UsuarioId) REFERENCES Usuario(Id),");
+            sql.AppendLine("  CONSTRAINT FK_EmprestimoAnterior FOREIGN KEY(EmprestimoAnteriorId) REFERENCES Emprestimo(Id)");
             sql.AppendLine(");");
 
             var cmdText = sql.ToString();
