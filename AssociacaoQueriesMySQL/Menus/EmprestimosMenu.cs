@@ -22,12 +22,14 @@ namespace AssociacaoQueriesMySQL.Menus
 
             Console.Clear();
             Console.WriteLine("1 - Listar Empréstimos");
+            Console.WriteLine("2 - Inserir Empréstimo");
 
             var opcao = Console.ReadLine();
 
             var opcoes = new Dictionary<string, Action>
             {
-                { "1", Listar }
+                { "1", Listar },
+                { "2", Inserir }
             };
 
             opcoes.ExecutarOpcao(opcao, _menuInicial);
@@ -39,6 +41,29 @@ namespace AssociacaoQueriesMySQL.Menus
 
             using var db = new EmprestimoRepositorio(_connectionString);
             db.Listar();
+            db.Dispose();
+
+            Console.ReadKey();
+            Iniciar();
+        }
+
+        private static void Inserir()
+        {
+            Console.Clear();
+
+            Console.Write("Informe o id do Produto: ");
+            var produtoId = Convert.ToInt32(Console.ReadLine());
+            Console.Write("Informe o id do Cliente: ");
+            var clienteId = Convert.ToInt32(Console.ReadLine());
+            Console.Write("Informe o id do Usuário: ");
+            var usuarioId = Convert.ToInt32(Console.ReadLine());
+            Console.Write("Informe a Data do Empréstimo (yyyy-MM-dd HH:mm:ss): ");
+            var dataEmprestimo = Console.ReadLine();
+            Console.Write("Informe a Data Limite de Devolução do Produto (yyyy-MM-dd HH:mm:ss): ");
+            var dataLimiteDevolucao = Console.ReadLine();
+
+            using var db = new EmprestimoRepositorio(_connectionString);
+            db.Inserir(produtoId, clienteId, usuarioId, dataEmprestimo, dataLimiteDevolucao);
             db.Dispose();
 
             Console.ReadKey();

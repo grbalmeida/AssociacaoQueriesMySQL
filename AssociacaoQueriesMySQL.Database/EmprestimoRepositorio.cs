@@ -67,6 +67,60 @@ namespace AssociacaoQueriesMySQL.Database
             reader.Dispose();
         }
 
+        public void Inserir(
+            int produtoId,
+            int clienteId,
+            int usuarioId,
+            string dataEmprestimo,
+            string dataLimiteDevolucao
+        )
+        {
+            var sql = new StringBuilder();
+
+            sql.AppendLine("INSERT INTO Emprestimo (ProdutoId, ClienteId, UsuarioId,");
+            sql.AppendLine("DataEmprestimo, DataLimiteDevolucao) VALUES (@ProdutoId,");
+            sql.AppendLine("@ClienteId, @UsuarioId, @DataEmprestimo, @DataLimiteDevolucao)");
+
+            var cmdText = sql.ToString();
+
+            MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+            comando.Parameters.Add(new MySqlParameter("ProdutoId", produtoId));
+            comando.Parameters.Add(new MySqlParameter("ClienteId", clienteId));
+            comando.Parameters.Add(new MySqlParameter("UsuarioId", usuarioId));
+            comando.Parameters.Add(new MySqlParameter("DataEmprestimo", dataEmprestimo));
+            comando.Parameters.Add(new MySqlParameter("DataLimiteDevolucao", dataLimiteDevolucao));
+
+            try
+            {
+                var linhasAfetadas = comando.ExecuteNonQuery();
+                
+                if (linhasAfetadas > 0)
+                {
+                    ConsoleExtensions.Success("Empréstimo inserido com sucesso");
+                }
+            }
+            catch (MySqlException e)
+            {
+                if (e.Number == (int)MySqlErrorCode.NoReferencedRow2)
+                {
+                    if (e.Message.Contains("FK_Produto")) ConsoleExtensions.Error("Produto não existe");
+                    else if (e.Message.Contains("FK_Cliente")) ConsoleExtensions.Error("Cliente não existe");
+                    else if (e.Message.Contains("FK_Usuario")) ConsoleExtensions.Error("Usuário não existe");
+                }
+                else if (e.Number == (int)MySqlErrorCode.TruncatedWrongValue)
+                {
+                    if (e.Message.Contains("DataEmprestimo")) ConsoleExtensions.Error("Data Empréstimo em formato inválido");
+                    else if (e.Message.Contains("DataLimiteDevolucao")) ConsoleExtensions.Error("Data Limite Devolução em formato inválido");
+                }
+                else
+                {
+                    if (e.Message.Contains("CH_DataLimiteDevolucao")) ConsoleExtensions.Error("A Data Limite Devolução não pode ser menor que a Data Empréstimo");
+                }
+            }
+
+            comando.Dispose();
+        }
+
         public void Dispose()
         {
             _conexao?.Dispose();
