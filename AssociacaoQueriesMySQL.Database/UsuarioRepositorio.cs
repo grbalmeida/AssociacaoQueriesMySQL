@@ -144,15 +144,25 @@ namespace AssociacaoQueriesMySQL.Database
             MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
             comando.Parameters.Add(new MySqlParameter("Id", id));
 
-            var linhasAfetadas = comando.ExecuteNonQuery();
+            try
+            {
+                var linhasAfetadas = comando.ExecuteNonQuery();
 
-            if (linhasAfetadas > 0)
-            {
-                ConsoleExtensions.Success("Usuário excluído com sucesso");
+                if (linhasAfetadas > 0)
+                {
+                    ConsoleExtensions.Success("Usuário excluído com sucesso");
+                }
+                else
+                {
+                    ConsoleExtensions.Warning("Usuário não existe");
+                }
             }
-            else
+            catch (MySqlException e)
             {
-                ConsoleExtensions.Warning("Usuário não existe");
+                if (e.Number == (int)MySqlErrorCode.RowIsReferenced2)
+                {
+                    if (e.Message.Contains("FK_Usuario")) ConsoleExtensions.Error("Não é possível excluir esse usuário pois existem empréstimos associados a ele");
+                }
             }
 
             comando.Dispose();
