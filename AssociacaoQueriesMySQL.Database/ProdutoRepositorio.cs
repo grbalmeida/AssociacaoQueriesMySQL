@@ -112,6 +112,9 @@ namespace AssociacaoQueriesMySQL.Database
                 {
                     if (e.Message.Contains("Nome")) ConsoleExtensions.Error("O Nome deve possuir no máximo 100 caracteres");
                 }
+                else if (e.Number == (int)MySqlErrorCode.NoReferencedRow2) {
+                    if (e.Message.Contains("FK_Categoria")) ConsoleExtensions.Error("Categoria não existe");
+                }
             }
 
             comando.Dispose();
