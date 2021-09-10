@@ -121,6 +121,37 @@ namespace AssociacaoQueriesMySQL.Database
             comando.Dispose();
         }
 
+        public void Remover(int id)
+        {
+            var cmdText = "DELETE FROM Emprestimo WHERE Id = @Id";
+
+            MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+            comando.Parameters.Add(new MySqlParameter("Id", id));
+
+            try
+            {
+                var linhasAfetadas = comando.ExecuteNonQuery();
+
+                if (linhasAfetadas > 0)
+                {
+                    ConsoleExtensions.Success("Empréstimo excluído com sucesso");
+                }
+                else
+                {
+                    ConsoleExtensions.Warning("Empréstimo não existe");
+                }
+            }
+            catch (MySqlException e)
+            {
+                if (e.Number == (int)MySqlErrorCode.RowIsReferenced2)
+                {
+                    if (e.Message.Contains("FK_EmprestimoAnterior")) ConsoleExtensions.Error("Não é possível excluir esse empréstimo pois existem empréstimos associados a ele");
+                }
+            }
+
+            comando.Dispose();
+        }
+
         public void Dispose()
         {
             _conexao?.Dispose();

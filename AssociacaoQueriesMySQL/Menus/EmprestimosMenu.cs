@@ -23,13 +23,15 @@ namespace AssociacaoQueriesMySQL.Menus
             Console.Clear();
             Console.WriteLine("1 - Listar Empréstimos");
             Console.WriteLine("2 - Inserir Empréstimo");
+            Console.WriteLine("3 - Remover Empréstimo");
 
             var opcao = Console.ReadLine();
 
             var opcoes = new Dictionary<string, Action>
             {
                 { "1", Listar },
-                { "2", Inserir }
+                { "2", Inserir },
+                { "3", Remover }
             };
 
             opcoes.ExecutarOpcao(opcao, _menuInicial);
@@ -64,6 +66,20 @@ namespace AssociacaoQueriesMySQL.Menus
 
             using var db = new EmprestimoRepositorio(_connectionString);
             db.Inserir(produtoId, clienteId, usuarioId, dataEmprestimo, dataLimiteDevolucao);
+            db.Dispose();
+
+            Console.ReadKey();
+            Iniciar();
+        }
+
+        private static void Remover()
+        {
+            Console.Clear();
+            Console.Write("Informe o Id: ");
+            var id = Convert.ToInt32(Console.ReadLine());
+
+            using var db = new EmprestimoRepositorio(_connectionString);
+            db.Remover(id);
             db.Dispose();
 
             Console.ReadKey();
