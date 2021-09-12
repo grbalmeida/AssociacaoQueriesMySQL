@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace AssociacaoQueriesMySQL.Extensions
+namespace AssociacaoQueriesMySQL.Core.Extensions
 {
     public static class DictionaryExtensions
     {

@@ -8,4 +8,8 @@
     <PackageReference Include="MySql.Data" Version="8.0.26" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AssociacaoQueriesMySQL.Core\AssociacaoQueriesMySQL.Core.csproj" />
+  </ItemGroup>
+
 </Project>

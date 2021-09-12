@@ -1,5 +1,5 @@
-﻿using AssociacaoQueriesMySQL.Database;
-using AssociacaoQueriesMySQL.Extensions;
+﻿using AssociacaoQueriesMySQL.Core.Extensions;
+using AssociacaoQueriesMySQL.Database;
 using AssociacaoQueriesMySQL.Menus;
 using System;
 using System.Collections.Generic;

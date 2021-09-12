@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AssociacaoQueriesMySQL.Extensions
+namespace AssociacaoQueriesMySQL.Core.Extensions
 {
     public static class PasswordExtensions
     {

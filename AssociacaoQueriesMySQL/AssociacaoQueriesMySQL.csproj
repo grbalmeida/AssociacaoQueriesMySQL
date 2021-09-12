@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AssociacaoQueriesMySQL.Core\AssociacaoQueriesMySQL.Core.csproj" />
     <ProjectReference Include="..\AssociacaoQueriesMySQL.Database\AssociacaoQueriesMySQL.Database.csproj" />
   </ItemGroup>
 

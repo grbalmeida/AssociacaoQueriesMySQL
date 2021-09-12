@@ -1,5 +1,7 @@
-﻿using MySql.Data.MySqlClient;
+﻿using AssociacaoQueriesMySQL.Core.Models;
+using MySql.Data.MySqlClient;
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace AssociacaoQueriesMySQL.Database
@@ -14,18 +16,109 @@ namespace AssociacaoQueriesMySQL.Database
             _conexao.Open();
         }
 
-        public void Listar()
+        public void Listar(ProdutoFiltro filtro)
         {
             var sql = new StringBuilder();
             sql.AppendLine("SELECT p.Id, p.Nome, p.Descricao, p.Ativo, p.Valor,");
             sql.AppendLine("p.QuantidadeEstoque, p.Altura, p.Largura, p.Profundidade, c.Nome as NomeCategoria");
             sql.AppendLine("FROM Produto p ");
             sql.AppendLine("INNER JOIN Categoria c ON p.CategoriaId = c.Id");
+
+            sql.AppendLine("WHERE 1 = 1");
+
+            var parametros = new List<MySqlParameter>();
+
+            if (!string.IsNullOrEmpty(filtro.Nome))
+            {
+                sql.AppendLine("AND p.Nome LIKE @Nome");
+                parametros.Add(new MySqlParameter("Nome", $"%{filtro.Nome}%"));
+            }
+
+            if (!string.IsNullOrEmpty(filtro.Descricao))
+            {
+                sql.AppendLine("AND p.Descricao LIKE @Descricao");
+                parametros.Add(new MySqlParameter("Descricao", $"%{filtro.Descricao}%"));
+            }
+
+            if (filtro.Ativo.HasValue)
+            {
+                sql.AppendLine("AND p.Ativo = @Ativo");
+                parametros.Add(new MySqlParameter("Ativo", filtro.Ativo));
+            }
+
+            if (filtro.ValorMinimo.HasValue)
+            {
+                sql.AppendLine("AND p.Valor >= @ValorMinimo");
+                parametros.Add(new MySqlParameter("ValorMinimo", filtro.ValorMinimo));
+            }
+
+            if (filtro.ValorMaximo.HasValue)
+            {
+                sql.AppendLine("AND p.Valor <= @ValorMaximo");
+                parametros.Add(new MySqlParameter("ValorMaximo", filtro.ValorMaximo));
+            }
+
+            if (filtro.CategoriaId.HasValue)
+            {
+                sql.AppendLine("AND p.CategoriaId = @CategoriaId");
+                parametros.Add(new MySqlParameter("CategoriaId", filtro.CategoriaId));
+            }
+
+            if (filtro.QuantidadeEstoqueMinima.HasValue)
+            {
+                sql.AppendLine("AND p.QuantidadeEstoque >= @QuantidadeEstoqueMinima");
+                parametros.Add(new MySqlParameter("QuantidadeEstoqueMinima", filtro.QuantidadeEstoqueMinima));
+            }
+
+            if (filtro.QuantidadeEstoqueMaxima.HasValue)
+            {
+                sql.AppendLine("AND p.QuantidadeEstoque <= @QuantidadeEstoqueMaxima");
+                parametros.Add(new MySqlParameter("QuantidadeEstoqueMaxima", filtro.QuantidadeEstoqueMaxima));
+            }
+
+            if (filtro.AlturaMinima.HasValue)
+            {
+                sql.AppendLine("AND p.Altura >= @AlturaMinima");
+                parametros.Add(new MySqlParameter("AlturaMinima", filtro.AlturaMinima));
+            }
+
+            if (filtro.AlturaMaxima.HasValue)
+            {
+                sql.AppendLine("AND p.Altura <= @AlturaMaxima");
+                parametros.Add(new MySqlParameter("AlturaMaxima", filtro.AlturaMaxima));
+            }
+
+            if (filtro.LarguraMinima.HasValue)
+            {
+                sql.AppendLine("AND p.Largura >= @LarguraMinima");
+                parametros.Add(new MySqlParameter("LarguraMinima", filtro.LarguraMinima));
+            }
+
+            if (filtro.LarguraMaxima.HasValue)
+            {
+                sql.AppendLine("AND p.Largura <= @LarguraMaxima");
+                parametros.Add(new MySqlParameter("LarguraMaxima", filtro.LarguraMaxima));
+            }
+
+            if (filtro.ProfundidadeMinima.HasValue)
+            {
+                sql.AppendLine("AND p.Profundidade >= @ProfundidadeMinima");
+                parametros.Add(new MySqlParameter("ProfundidadeMinima", filtro.ProfundidadeMinima));
+            }
+
+            if (filtro.ProfundidadeMaxima.HasValue)
+            {
+                sql.AppendLine("AND p.Profundidade <= @ProfundidadeMaxima");
+                parametros.Add(new MySqlParameter("ProfundidadeMaxima", filtro.ProfundidadeMaxima));
+            }
+            
             sql.AppendLine("ORDER BY p.Id ASC");
 
             var cmdText = sql.ToString();
 
             MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+
+            comando.Parameters.AddRange(parametros.ToArray());
 
             MySqlDataReader reader = comando.ExecuteReader();
 
