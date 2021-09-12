@@ -1,6 +1,8 @@
 ﻿using AssociacaoQueriesMySQL.Core.Extensions;
+using AssociacaoQueriesMySQL.Core.Models;
 using MySql.Data.MySqlClient;
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace AssociacaoQueriesMySQL.Database
@@ -15,11 +17,88 @@ namespace AssociacaoQueriesMySQL.Database
             _conexao.Open();
         }
 
-        public void Listar()
+        public void Listar(UsuarioFiltro filtro)
         {
-            var cmdText = "SELECT * FROM Usuario ORDER BY Id ASC";
+            var sql = new StringBuilder();
+            sql.AppendLine("SELECT * FROM Usuario");
+
+            sql.AppendLine("WHERE 1 = 1");
+
+            var parametros = new List<MySqlParameter>();
+
+            if (!string.IsNullOrEmpty(filtro.Nome))
+            {
+                sql.AppendLine("AND Nome LIKE @Nome");
+                parametros.Add(new MySqlParameter("Nome", $"%{filtro.Nome}%"));
+            }
+
+            if (!string.IsNullOrEmpty(filtro.CPF))
+            {
+                sql.AppendLine("AND CPF LIKE @CPF");
+                parametros.Add(new MySqlParameter("CPF", $"%{filtro.CPF}%"));
+            }
+
+            if (!string.IsNullOrEmpty(filtro.Email))
+            {
+                sql.AppendLine("AND Email LIKE @Email");
+                parametros.Add(new MySqlParameter("Email", $"%{filtro.Email}%"));
+            }
+
+            if (!string.IsNullOrEmpty(filtro.DataNascimentoInicial))
+            {
+                sql.AppendLine("AND DataNascimento >= @DataNascimentoInicial");
+                parametros.Add(new MySqlParameter("DataNascimentoInicial", $"{filtro.DataNascimentoInicial} 00:00:00"));
+            }
+
+            if (!string.IsNullOrEmpty(filtro.DataNascimentoFinal))
+            {
+                sql.AppendLine("AND DataNascimento <= @DataNascimentoFinal");
+                parametros.Add(new MySqlParameter("DataNascimentoFinal", $"{filtro.DataNascimentoFinal} 23:59:59"));
+            }
+
+            if (!string.IsNullOrEmpty(filtro.Endereco))
+            {
+                sql.AppendLine("AND Endereco LIKE @Endereco");
+                parametros.Add(new MySqlParameter("Endereco", $"%{filtro.Endereco}%"));
+            }
+
+            if (!string.IsNullOrEmpty(filtro.Cidade))
+            {
+                sql.AppendLine("AND Cidade LIKE @Cidade");
+                parametros.Add(new MySqlParameter("Cidade", $"%{filtro.Cidade}%"));
+            }
+
+            if (!string.IsNullOrEmpty(filtro.Estado))
+            {
+                sql.AppendLine("AND Estado LIKE @Estado");
+                parametros.Add(new MySqlParameter("Estado", $"%{filtro.Estado}%"));
+            }
+
+            if (!string.IsNullOrEmpty(filtro.Pais))
+            {
+                sql.AppendLine("AND Pais LIKE @Pais");
+                parametros.Add(new MySqlParameter("Pais", $"%{filtro.Pais}%"));
+            }
+
+            if (!string.IsNullOrEmpty(filtro.CEP))
+            {
+                sql.AppendLine("AND CEP LIKE @CEP");
+                parametros.Add(new MySqlParameter("CEP", $"%{filtro.CEP}%"));
+            }
+
+            if (!string.IsNullOrEmpty(filtro.Fone))
+            {
+                sql.AppendLine("AND Fone LIKE @Fone");
+                parametros.Add(new MySqlParameter("Fone", $"%{filtro.Fone}%"));
+            }
+
+            sql.AppendLine("ORDER BY Id ASC");
+
+            var cmdText = sql.ToString();
 
             MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+
+            comando.Parameters.AddRange(parametros.ToArray());
 
             MySqlDataReader reader = comando.ExecuteReader();
 

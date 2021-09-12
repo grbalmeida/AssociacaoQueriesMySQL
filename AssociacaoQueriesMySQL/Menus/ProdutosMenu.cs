@@ -41,6 +41,8 @@ namespace AssociacaoQueriesMySQL.Menus
         private static void Listar()
         {
             Console.Clear();
+
+            Console.WriteLine("Filtros");
             Console.Write("Informe o Nome: ");
             var nomeFiltro = Console.ReadLine();
             Console.Write("Informe a Descrição: ");

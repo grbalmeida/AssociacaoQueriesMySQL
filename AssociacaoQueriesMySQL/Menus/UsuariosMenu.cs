@@ -1,4 +1,5 @@
 ﻿using AssociacaoQueriesMySQL.Core.Extensions;
+using AssociacaoQueriesMySQL.Core.Models;
 using AssociacaoQueriesMySQL.Database;
 using System;
 using System.Collections.Generic;
@@ -41,8 +42,49 @@ namespace AssociacaoQueriesMySQL.Menus
         {
             Console.Clear();
 
+            Console.WriteLine("Filtros");
+            Console.Write("Informe o Nome: ");
+            var nomeFiltro = Console.ReadLine();
+            Console.Write("Data Nascimento Inicial (yyyy-mm-dd): ");
+            var dataNascimentoInicialFiltro = Console.ReadLine();
+            Console.Write("Data Nascimento Final (yyyy-mm-dd): ");
+            var dataNascimentoFinalFiltro = Console.ReadLine();
+            Console.Write("Informe o CPF: ");
+            var cpfFiltro = Console.ReadLine();
+            Console.Write("Informe o Email: ");
+            var emailFiltro = Console.ReadLine();
+            Console.Write("Informe o Fone: ");
+            var foneFiltro = Console.ReadLine();
+            Console.Write("Informe o Endereço: ");
+            var enderecoFiltro = Console.ReadLine();
+            Console.Write("Informe a Cidade: ");
+            var cidadeFiltro = Console.ReadLine();
+            Console.Write("Informe o Estado: ");
+            var estadoFiltro = Console.ReadLine();
+            Console.Write("Informe o País: ");
+            var paisFiltro = Console.ReadLine();
+            Console.Write("Informe o CEP: ");
+            var cepFiltro = Console.ReadLine();
+
+            var usuarioFiltro = new UsuarioFiltro
+            {
+                Nome = nomeFiltro,
+                DataNascimentoInicial = dataNascimentoInicialFiltro,
+                DataNascimentoFinal = dataNascimentoFinalFiltro,
+                CPF = cpfFiltro,
+                Email = emailFiltro,
+                Fone = foneFiltro,
+                Endereco = enderecoFiltro,
+                Cidade = cidadeFiltro,
+                Estado = estadoFiltro,
+                Pais = paisFiltro,
+                CEP = cepFiltro,
+            };
+
+            Console.Clear();
+
             using var db = new UsuarioRepositorio(_connectionString);
-            db.Listar();
+            db.Listar(usuarioFiltro);
             db.Dispose();
 
             Console.ReadKey();
