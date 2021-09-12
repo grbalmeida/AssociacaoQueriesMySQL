@@ -5,21 +5,19 @@ using System.Collections.Generic;
 
 namespace AssociacaoQueriesMySQL.Menus
 {
-    public static class CategoriasMenu
+    public class CategoriasMenu : IDisposable
     {
-        private static Action _menuInicial;
-        private static string _connectionString;
+        private readonly Action _menuInicial;
+        private readonly CategoriaRepositorio _repo;
 
-        private static void Iniciar()
-        {
-            Iniciar(_menuInicial, _connectionString);
-        }
-
-        public static void Iniciar(Action menuInicial, string connectionString)
+        public CategoriasMenu(Action menuInicial)
         {
             _menuInicial = menuInicial;
-            _connectionString = connectionString;
+            _repo = new CategoriaRepositorio();
+        }
 
+        public void Iniciar()
+        {
             Console.Clear();
             Console.WriteLine("1 - Listar Categorias");
             Console.WriteLine("2 - Inserir Categoria");
@@ -37,7 +35,7 @@ namespace AssociacaoQueriesMySQL.Menus
             opcoes.ExecutarOpcao(opcao, _menuInicial);
         }
 
-        static void Listar()
+        private void Listar()
         {
             Console.Clear();
 
@@ -46,16 +44,15 @@ namespace AssociacaoQueriesMySQL.Menus
             var nomeFiltro = Console.ReadLine();
 
             Console.Clear();
-
-            using var db = new CategoriaRepositorio(_connectionString);
-            db.Listar(nomeFiltro);
-            db.Dispose();
+            
+            _repo.Listar(nomeFiltro);
+            Dispose();
 
             Console.ReadKey();
             Iniciar();
         }
 
-        private static void Inserir()
+        private void Inserir()
         {
             Console.Clear();
             Console.Write("Informe o Id: ");
@@ -63,26 +60,29 @@ namespace AssociacaoQueriesMySQL.Menus
             Console.Write("Informe o Nome: ");
             var nome = Console.ReadLine();
 
-            using var db = new CategoriaRepositorio(_connectionString);
-            db.Inserir(id, nome);
-            db.Dispose();
+            _repo.Inserir(id, nome);
+            Dispose();
 
             Console.ReadKey();
             Iniciar();
         }
 
-        static void Remover()
+        private void Remover()
         {
             Console.Clear();
             Console.Write("Informe o Id: ");
             var id = Convert.ToInt32(Console.ReadLine());
 
-            using var db = new CategoriaRepositorio(_connectionString);
-            db.Remover(id);
-            db.Dispose();
+            _repo.Remover(id);
+            Dispose();
 
             Console.ReadKey();
             Iniciar();
+        }
+
+        public void Dispose()
+        {
+            _repo?.Dispose();
         }
     }
 }

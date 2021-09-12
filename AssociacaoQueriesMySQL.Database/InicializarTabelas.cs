@@ -1,18 +1,12 @@
 ﻿using MySql.Data.MySqlClient;
-using System;
 using System.Text;
 
 namespace AssociacaoQueriesMySQL.Database
 {
-    public class InicializarTabelas : IDisposable
+    public class InicializarTabelas : Repositorio
     {
-        private readonly MySqlConnection _conexao;
-
-        public InicializarTabelas(string connectionString)
+        public InicializarTabelas()
         {
-            _conexao = new MySqlConnection(connectionString);
-            _conexao.Open();
-
             InicializarTabelaUsuario();
             InicializarTabelaCliente();
             InicializarTabelaCategoria();
@@ -43,7 +37,7 @@ namespace AssociacaoQueriesMySQL.Database
 
             var cmdText = sql.ToString();
 
-            MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+            MySqlCommand comando = new(cmdText, _conexao);
 
             comando.ExecuteNonQuery();
             comando.Dispose();
@@ -71,7 +65,7 @@ namespace AssociacaoQueriesMySQL.Database
 
             var cmdText = sql.ToString();
 
-            MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+            MySqlCommand comando = new(cmdText, _conexao);
             
             comando.ExecuteNonQuery();
             comando.Dispose();
@@ -89,7 +83,7 @@ namespace AssociacaoQueriesMySQL.Database
 
             var cmdText = sql.ToString();
 
-            MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+            MySqlCommand comando = new(cmdText, _conexao);
 
             comando.ExecuteNonQuery();
             comando.Dispose();
@@ -116,7 +110,7 @@ namespace AssociacaoQueriesMySQL.Database
 
             var cmdText = sql.ToString();
 
-            MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+            MySqlCommand comando = new(cmdText, _conexao);
 
             comando.ExecuteNonQuery();
             comando.Dispose();
@@ -146,15 +140,10 @@ namespace AssociacaoQueriesMySQL.Database
 
             var cmdText = sql.ToString();
 
-            MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+            MySqlCommand comando = new(cmdText, _conexao);
 
             comando.ExecuteNonQuery();
             comando.Dispose();
-        }
-
-        public void Dispose()
-        {
-            _conexao?.Close();
         }
     }
 }

@@ -7,16 +7,8 @@ using System.Text;
 
 namespace AssociacaoQueriesMySQL.Database
 {
-    public class UsuarioRepositorio : IDisposable
+    public class UsuarioRepositorio : Repositorio
     {
-        private readonly MySqlConnection _conexao;
-
-        public UsuarioRepositorio(string connectionString)
-        {
-            _conexao = new MySqlConnection(connectionString);
-            _conexao.Open();
-        }
-
         public void Listar(UsuarioFiltro filtro)
         {
             var sql = new StringBuilder();
@@ -96,7 +88,7 @@ namespace AssociacaoQueriesMySQL.Database
 
             var cmdText = sql.ToString();
 
-            MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+            MySqlCommand comando = new(cmdText, _conexao);
 
             comando.Parameters.AddRange(parametros.ToArray());
 
@@ -122,7 +114,7 @@ namespace AssociacaoQueriesMySQL.Database
                     Console.WriteLine($"Nome: {nome}");
                     Console.WriteLine($"CPF: {cpf}");
                     Console.WriteLine($"Email: {email}");
-                    Console.WriteLine($"Data Nascimento: {dataNascimento.ToString("dd/MM/yyyy")}");
+                    Console.WriteLine($"Data Nascimento: {dataNascimento:dd/MM/yyyy}");
                     Console.WriteLine($"Endereço: {endereco}");
                     Console.WriteLine($"Estado: {estado}");
                     Console.WriteLine($"País: {pais}");
@@ -169,7 +161,7 @@ namespace AssociacaoQueriesMySQL.Database
 
             var cmdText = sql.ToString();
 
-            MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+            MySqlCommand comando = new(cmdText, _conexao);
             comando.Parameters.Add(new MySqlParameter("Nome", nome));
             comando.Parameters.Add(new MySqlParameter("Cpf", cpf));
             comando.Parameters.Add(new MySqlParameter("Email", email));
@@ -221,7 +213,7 @@ namespace AssociacaoQueriesMySQL.Database
         {
             var cmdText = "DELETE FROM Usuario WHERE Id = @Id";
 
-            MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+            MySqlCommand comando = new(cmdText, _conexao);
             comando.Parameters.Add(new MySqlParameter("Id", id));
 
             try
@@ -246,11 +238,6 @@ namespace AssociacaoQueriesMySQL.Database
             }
 
             comando.Dispose();
-        }
-
-        public void Dispose()
-        {
-            _conexao?.Dispose();
         }
     }
 }

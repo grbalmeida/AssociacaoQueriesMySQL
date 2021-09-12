@@ -6,21 +6,19 @@ using System.Collections.Generic;
 
 namespace AssociacaoQueriesMySQL.Menus
 {
-    public static class UsuariosMenu
+    public class UsuariosMenu : IDisposable
     {
-        private static Action _menuInicial;
-        private static string _connectionString;
+        private readonly Action _menuInicial;
+        private readonly UsuarioRepositorio _repo;
 
-        private static void Iniciar()
-        {
-            Iniciar(_menuInicial, _connectionString);
-        }
-
-        public static void Iniciar(Action menuInicial, string connectionString)
+        public UsuariosMenu(Action menuInicial)
         {
             _menuInicial = menuInicial;
-            _connectionString = connectionString;
+            _repo = new UsuarioRepositorio();
+        }
 
+        public void Iniciar()
+        {
             Console.Clear();
             Console.WriteLine("1 - Listar Usuários");
             Console.WriteLine("2 - Inserir Usuário");
@@ -38,7 +36,7 @@ namespace AssociacaoQueriesMySQL.Menus
             opcoes.ExecutarOpcao(opcao, _menuInicial);
         }
 
-        private static void Listar()
+        private void Listar()
         {
             Console.Clear();
 
@@ -83,15 +81,14 @@ namespace AssociacaoQueriesMySQL.Menus
 
             Console.Clear();
 
-            using var db = new UsuarioRepositorio(_connectionString);
-            db.Listar(usuarioFiltro);
-            db.Dispose();
+            _repo.Listar(usuarioFiltro);
+            Dispose();
 
             Console.ReadKey();
             Iniciar();
         }
 
-        private static void Inserir()
+        private void Inserir()
         {
             Console.Clear();
             Console.Write("Informe o Nome: ");
@@ -120,26 +117,29 @@ namespace AssociacaoQueriesMySQL.Menus
             Console.Write("Informe a Imagem: ");
             var imagem = Console.ReadLine();
 
-            using var db = new UsuarioRepositorio(_connectionString);
-            db.Inserir(nome, cpf, email, senha, dataNascimento, endereco, cidade, estado, pais, cep, fone, imagem);
-            db.Dispose();
+            _repo.Inserir(nome, cpf, email, senha, dataNascimento, endereco, cidade, estado, pais, cep, fone, imagem);
+            Dispose();
 
             Console.ReadKey();
             Iniciar();
         }
 
-        private static void Remover()
+        private void Remover()
         {
             Console.Clear();
             Console.Write("Informe o Id: ");
             var id = Convert.ToInt32(Console.ReadLine());
 
-            using var db = new UsuarioRepositorio(_connectionString);
-            db.Remover(id);
-            db.Dispose();
+            _repo.Remover(id);
+            Dispose();
 
             Console.ReadKey();
             Iniciar();
+        }
+
+        public void Dispose()
+        {
+            _repo?.Dispose();
         }
     }
 }

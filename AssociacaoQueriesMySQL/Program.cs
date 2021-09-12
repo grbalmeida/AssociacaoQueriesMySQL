@@ -3,14 +3,11 @@ using AssociacaoQueriesMySQL.Database;
 using AssociacaoQueriesMySQL.Menus;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 
 namespace AssociacaoQueriesMySQL
 {
     class Program
     {
-        private static readonly string _connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ToString();
-
         static void Main(string[] args)
         {
             CriarTabelas();
@@ -32,13 +29,19 @@ namespace AssociacaoQueriesMySQL
 
             var opcao = Console.ReadLine();
 
+            using var categoriaMenu = new CategoriasMenu(ExibirMenuInicial);
+            using var clienteMenu = new ClientesMenu(ExibirMenuInicial);
+            using var usuarioMenu = new UsuariosMenu(ExibirMenuInicial);
+            using var produtoMenu = new ProdutosMenu(ExibirMenuInicial);
+            using var emprestimoMenu = new EmprestimosMenu(ExibirMenuInicial);
+
             var opcoes = new Dictionary<string, Action>
             {
-                { "1", () => UsuariosMenu.Iniciar(ExibirMenuInicial, _connectionString) },
-                { "2", () => ClientesMenu.Iniciar(ExibirMenuInicial, _connectionString) },
-                { "3", () => CategoriasMenu.Iniciar(ExibirMenuInicial, _connectionString) },
-                { "4", () => ProdutosMenu.Iniciar(ExibirMenuInicial, _connectionString) },
-                { "5", () => EmprestimosMenu.Iniciar(ExibirMenuInicial, _connectionString) }
+                { "1", () => usuarioMenu.Iniciar() },
+                { "2", () => clienteMenu.Iniciar() },
+                { "3", () => categoriaMenu.Iniciar() },
+                { "4", () => produtoMenu.Iniciar() },
+                { "5", () => emprestimoMenu.Iniciar() }
             };
 
             opcoes.ExecutarOpcao(opcao, ExibirMenuInicial);
@@ -46,7 +49,7 @@ namespace AssociacaoQueriesMySQL
 
         static void CriarTabelas()
         {
-            using var db = new InicializarTabelas(_connectionString);
+            using var db = new InicializarTabelas();
 
             Console.Clear();
         }

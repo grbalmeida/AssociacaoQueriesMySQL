@@ -5,21 +5,19 @@ using System.Collections.Generic;
 
 namespace AssociacaoQueriesMySQL.Menus
 {
-    public static class EmprestimosMenu
+    public class EmprestimosMenu : IDisposable
     {
-        private static Action _menuInicial;
-        private static string _connectionString;
+        private readonly Action _menuInicial;
+        private readonly EmprestimoRepositorio _repo;
 
-        private static void Iniciar()
-        {
-            Iniciar(_menuInicial, _connectionString);
-        }
-
-        public static void Iniciar(Action menuInicial, string connectionString)
+        public EmprestimosMenu(Action menuInicial)
         {
             _menuInicial = menuInicial;
-            _connectionString = connectionString;
+            _repo = new EmprestimoRepositorio();
+        }
 
+        public void Iniciar()
+        {
             Console.Clear();
             Console.WriteLine("1 - Listar Empréstimos");
             Console.WriteLine("2 - Inserir Empréstimo");
@@ -37,19 +35,18 @@ namespace AssociacaoQueriesMySQL.Menus
             opcoes.ExecutarOpcao(opcao, _menuInicial);
         }
 
-        private static void Listar()
+        private void Listar()
         {
             Console.Clear();
 
-            using var db = new EmprestimoRepositorio(_connectionString);
-            db.Listar();
-            db.Dispose();
+            _repo.Listar();
+            Dispose();
 
             Console.ReadKey();
             Iniciar();
         }
 
-        private static void Inserir()
+        private void Inserir()
         {
             Console.Clear();
 
@@ -64,26 +61,29 @@ namespace AssociacaoQueriesMySQL.Menus
             Console.Write("Informe a Data Limite de Devolução do Produto (yyyy-MM-dd HH:mm:ss): ");
             var dataLimiteDevolucao = Console.ReadLine();
 
-            using var db = new EmprestimoRepositorio(_connectionString);
-            db.Inserir(produtoId, clienteId, usuarioId, dataEmprestimo, dataLimiteDevolucao);
-            db.Dispose();
+            _repo.Inserir(produtoId, clienteId, usuarioId, dataEmprestimo, dataLimiteDevolucao);
+            Dispose();
 
             Console.ReadKey();
             Iniciar();
         }
 
-        private static void Remover()
+        private void Remover()
         {
             Console.Clear();
             Console.Write("Informe o Id: ");
             var id = Convert.ToInt32(Console.ReadLine());
 
-            using var db = new EmprestimoRepositorio(_connectionString);
-            db.Remover(id);
-            db.Dispose();
+            _repo.Remover(id);
+            Dispose();
 
             Console.ReadKey();
             Iniciar();
+        }
+
+        public void Dispose()
+        {
+            _repo?.Dispose();
         }
     }
 }

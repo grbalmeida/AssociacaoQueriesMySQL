@@ -7,16 +7,8 @@ using System.Text;
 
 namespace AssociacaoQueriesMySQL.Database
 {
-    public class ProdutoRepositorio : IDisposable
+    public class ProdutoRepositorio : Repositorio
     {
-        private readonly MySqlConnection _conexao;
-
-        public ProdutoRepositorio(string connectionString)
-        {
-            _conexao = new MySqlConnection(connectionString);
-            _conexao.Open();
-        }
-
         public void Listar(ProdutoFiltro filtro)
         {
             var sql = new StringBuilder();
@@ -117,7 +109,7 @@ namespace AssociacaoQueriesMySQL.Database
 
             var cmdText = sql.ToString();
 
-            MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+            MySqlCommand comando = new(cmdText, _conexao);
 
             comando.Parameters.AddRange(parametros.ToArray());
 
@@ -180,7 +172,7 @@ namespace AssociacaoQueriesMySQL.Database
 
             var cmdText = sql.ToString();
 
-            MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+            MySqlCommand comando = new(cmdText, _conexao);
             comando.Parameters.Add(new MySqlParameter("Nome", nome));
             comando.Parameters.Add(new MySqlParameter("Descricao", descricao));
             comando.Parameters.Add(new MySqlParameter("Ativo", ativo));
@@ -218,7 +210,7 @@ namespace AssociacaoQueriesMySQL.Database
         {
             var cmdText = "DELETE FROM Produto WHERE Id = @Id";
 
-            MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+            MySqlCommand comando = new(cmdText, _conexao);
             comando.Parameters.Add(new MySqlParameter("Id", id));
 
             try
@@ -243,11 +235,6 @@ namespace AssociacaoQueriesMySQL.Database
             }
 
             comando.Dispose();
-        }
-
-        public void Dispose()
-        {
-            _conexao?.Dispose();
         }
     }
 }

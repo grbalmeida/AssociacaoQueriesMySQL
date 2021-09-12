@@ -5,16 +5,8 @@ using System.Text;
 
 namespace AssociacaoQueriesMySQL.Database
 {
-    public class EmprestimoRepositorio : IDisposable
+    public class EmprestimoRepositorio : Repositorio
     {
-        private readonly MySqlConnection _conexao;
-
-        public EmprestimoRepositorio(string connectionString)
-        {
-            _conexao = new MySqlConnection(connectionString);
-            _conexao.Open();
-        }
-
         public void Listar()
         {
             var sql = new StringBuilder();
@@ -30,7 +22,7 @@ namespace AssociacaoQueriesMySQL.Database
 
             var cmdText = sql.ToString();
 
-            MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+            MySqlCommand comando = new(cmdText, _conexao);
 
             MySqlDataReader reader = comando.ExecuteReader();
 
@@ -48,7 +40,7 @@ namespace AssociacaoQueriesMySQL.Database
                     var nomeUsuario = reader.GetString("NomeUsuario");
 
                     Console.WriteLine($"Id: {id}");
-                    Console.WriteLine($"Data Empréstimo: {dataEmprestimo.ToString("dd/MM/yyyy HH:mm:ss")}");
+                    Console.WriteLine($"Data Empréstimo: {dataEmprestimo:dd/MM/yyyy HH:mm:ss}");
                     Console.WriteLine($"Data Limite Devolução: {dataLimiteDevolucao?.ToString("dd/MM/yyyy HH:mm:ss")}");
                     Console.WriteLine($"Data Devolução: {dataDevolucao?.ToString("dd/MM/yyyy HH:mm:ss")}");
                     Console.WriteLine($"Id Empréstimo Anterior: {emprestimoAnteriorId}");
@@ -84,7 +76,7 @@ namespace AssociacaoQueriesMySQL.Database
 
             var cmdText = sql.ToString();
 
-            MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+            MySqlCommand comando = new(cmdText, _conexao);
             comando.Parameters.Add(new MySqlParameter("ProdutoId", produtoId));
             comando.Parameters.Add(new MySqlParameter("ClienteId", clienteId));
             comando.Parameters.Add(new MySqlParameter("UsuarioId", usuarioId));
@@ -126,7 +118,7 @@ namespace AssociacaoQueriesMySQL.Database
         {
             var cmdText = "DELETE FROM Emprestimo WHERE Id = @Id";
 
-            MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+            MySqlCommand comando = new(cmdText, _conexao);
             comando.Parameters.Add(new MySqlParameter("Id", id));
 
             try
@@ -151,11 +143,6 @@ namespace AssociacaoQueriesMySQL.Database
             }
 
             comando.Dispose();
-        }
-
-        public void Dispose()
-        {
-            _conexao?.Dispose();
         }
     }
 }

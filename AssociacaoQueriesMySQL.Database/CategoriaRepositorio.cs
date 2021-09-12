@@ -5,16 +5,8 @@ using System.Text;
 
 namespace AssociacaoQueriesMySQL.Database
 {
-    public class CategoriaRepositorio : IDisposable
+    public class CategoriaRepositorio : Repositorio
     {
-        private readonly MySqlConnection _conexao;
-
-        public CategoriaRepositorio(string connectionString)
-        {
-            _conexao = new MySqlConnection(connectionString);
-            _conexao.Open();
-        }
-
         public void Listar(string nomeFiltro)
         {
             var sql = new StringBuilder();
@@ -27,7 +19,7 @@ namespace AssociacaoQueriesMySQL.Database
 
             var cmdText = sql.ToString();
 
-            MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+            MySqlCommand comando = new(cmdText, _conexao);
 
             if (!string.IsNullOrEmpty(nomeFiltro))
                 comando.Parameters.AddWithValue("@Nome", $"%{nomeFiltro}%");
@@ -60,7 +52,7 @@ namespace AssociacaoQueriesMySQL.Database
         {
             var cmdText = "INSERT INTO Categoria (Id, Nome) VALUES (@Id, @Nome)";
 
-            MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+            MySqlCommand comando = new(cmdText, _conexao);
             comando.Parameters.Add(new MySqlParameter("Id", id));
             comando.Parameters.Add(new MySqlParameter("Nome", nome));
 
@@ -93,7 +85,7 @@ namespace AssociacaoQueriesMySQL.Database
         {
             var cmdText = "DELETE FROM Categoria WHERE Id = @Id";
 
-            MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+            MySqlCommand comando = new(cmdText, _conexao);
             comando.Parameters.Add(new MySqlParameter("Id", id));
 
             try
@@ -118,11 +110,6 @@ namespace AssociacaoQueriesMySQL.Database
             }
 
             comando.Dispose();
-        } 
-
-        public void Dispose()
-        {
-            _conexao?.Dispose();
         }
     }
 }
