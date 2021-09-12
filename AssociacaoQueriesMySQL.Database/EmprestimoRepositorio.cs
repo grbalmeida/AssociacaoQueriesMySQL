@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿using AssociacaoQueriesMySQL.Core.Extensions;
+using MySql.Data.MySqlClient;
 using System;
 using System.Text;
 

@@ -1,4 +1,5 @@
-﻿using AssociacaoQueriesMySQL.Core.Models;
+﻿using AssociacaoQueriesMySQL.Core.Extensions;
+using AssociacaoQueriesMySQL.Core.Models;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;

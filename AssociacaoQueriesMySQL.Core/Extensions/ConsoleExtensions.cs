@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AssociacaoQueriesMySQL.Database
+namespace AssociacaoQueriesMySQL.Core.Extensions
 {
     public static class ConsoleExtensions
     {
