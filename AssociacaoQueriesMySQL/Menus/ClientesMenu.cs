@@ -41,8 +41,30 @@ namespace AssociacaoQueriesMySQL.Menus
         {
             Console.Clear();
 
+            Console.WriteLine("Filtros");
+            Console.Write("Informe o Nome: ");
+            var nomeFiltro = Console.ReadLine();
+            Console.Write("Informe o Documento: ");
+            var documentoFiltro = Console.ReadLine();
+            Console.Write("Informe o Email: ");
+            var emailFiltro = Console.ReadLine();
+            Console.Write("Informe o Endereço: ");
+            var enderecoFiltro = Console.ReadLine();
+            Console.Write("Informe a Cidade: ");
+            var cidadeFiltro = Console.ReadLine();
+            Console.Write("Informe o Estado: ");
+            var estadoFiltro = Console.ReadLine();
+            Console.Write("Informe o País: ");
+            var paisFiltro = Console.ReadLine();
+            Console.Write("Informe o CEP: ");
+            var cepFiltro = Console.ReadLine();
+            Console.Write("Informe o Fone: ");
+            var foneFiltro = Console.ReadLine();
+
+            Console.Clear();
+
             using var db = new ClienteRepositorio(_connectionString);
-            db.Listar();
+            db.Listar(nomeFiltro, documentoFiltro, emailFiltro, enderecoFiltro, cidadeFiltro, estadoFiltro, paisFiltro, cepFiltro, foneFiltro);
             db.Dispose();
 
             Console.ReadKey();

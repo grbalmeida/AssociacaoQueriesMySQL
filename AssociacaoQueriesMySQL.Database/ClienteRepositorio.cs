@@ -14,11 +14,47 @@ namespace AssociacaoQueriesMySQL.Database
             _conexao.Open();
         }
 
-        public void Listar()
+        public void Listar(
+            string nomeFiltro,
+            string documentoFiltro,
+            string emailFiltro,
+            string enderecoFiltro,
+            string cidadeFiltro,
+            string estadoFiltro,
+            string paisFiltro,
+            string cepFiltro,
+            string foneFiltro
+        )
         {
-            var cmdText = "SELECT * FROM Cliente ORDER BY Id ASC";
+            var sql = new StringBuilder();
+            sql.AppendLine("SELECT * FROM Cliente");
+            sql.AppendLine("WHERE 1 = 1");
+
+            if (!string.IsNullOrEmpty(nomeFiltro)) sql.AppendLine("AND Nome LIKE @Nome");
+            if (!string.IsNullOrEmpty(documentoFiltro)) sql.AppendLine("AND Documento LIKE @Documento");
+            if (!string.IsNullOrEmpty(emailFiltro)) sql.AppendLine("AND Email LIKE @Email");
+            if (!string.IsNullOrEmpty(enderecoFiltro)) sql.AppendLine("AND Endereco LIKE @Endereco");
+            if (!string.IsNullOrEmpty(cidadeFiltro)) sql.AppendLine("AND Cidade LIKE @Cidade");
+            if (!string.IsNullOrEmpty(estadoFiltro)) sql.AppendLine("AND Estado LIKE @Estado");
+            if (!string.IsNullOrEmpty(paisFiltro)) sql.AppendLine("AND Pais LIKE @Pais");
+            if (!string.IsNullOrEmpty(cepFiltro)) sql.AppendLine("AND CEP Like @CEP");
+            if (!string.IsNullOrEmpty(foneFiltro)) sql.AppendLine("AND Fone LIKE @Fone");
+
+            sql.AppendLine("ORDER BY Id ASC");
+
+            var cmdText = sql.ToString();
 
             MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+
+            if (!string.IsNullOrEmpty(nomeFiltro)) comando.Parameters.AddWithValue("@Nome", $"%{nomeFiltro}%");
+            if (!string.IsNullOrEmpty(documentoFiltro)) comando.Parameters.AddWithValue("@Documento", $"%{documentoFiltro}%");
+            if (!string.IsNullOrEmpty(emailFiltro)) comando.Parameters.AddWithValue("@Email", $"%{emailFiltro}%");
+            if (!string.IsNullOrEmpty(enderecoFiltro)) comando.Parameters.AddWithValue("@Endereco", $"%{enderecoFiltro}%");
+            if (!string.IsNullOrEmpty(cidadeFiltro)) comando.Parameters.AddWithValue("@Cidade", $"%{cidadeFiltro}%");
+            if (!string.IsNullOrEmpty(estadoFiltro)) comando.Parameters.AddWithValue("@Estado", $"%{estadoFiltro}%");
+            if (!string.IsNullOrEmpty(paisFiltro)) comando.Parameters.AddWithValue("@Pais", $"%{paisFiltro}%");
+            if (!string.IsNullOrEmpty(cepFiltro)) comando.Parameters.AddWithValue("@CEP", $"%{cepFiltro}%");
+            if (!string.IsNullOrEmpty(foneFiltro)) comando.Parameters.AddWithValue("@Fone", $"%{foneFiltro}%");
 
             MySqlDataReader reader = comando.ExecuteReader();
 
