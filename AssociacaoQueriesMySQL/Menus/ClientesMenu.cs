@@ -1,4 +1,5 @@
 ﻿using AssociacaoQueriesMySQL.Core.Extensions;
+using AssociacaoQueriesMySQL.Core.Models;
 using AssociacaoQueriesMySQL.Database;
 using System;
 using System.Collections.Generic;
@@ -61,10 +62,23 @@ namespace AssociacaoQueriesMySQL.Menus
             Console.Write("Informe o Fone: ");
             var foneFiltro = Console.ReadLine();
 
+            var clienteFiltro = new ClienteFiltro
+            {
+                Nome = nomeFiltro,
+                Documento = documentoFiltro,
+                Email = emailFiltro,
+                Endereco = enderecoFiltro,
+                Cidade = cidadeFiltro,
+                Estado = estadoFiltro,
+                Pais = paisFiltro,
+                CEP = cepFiltro,
+                Fone = foneFiltro
+            };
+
             Console.Clear();
 
             using var db = new ClienteRepositorio(_connectionString);
-            db.Listar(nomeFiltro, documentoFiltro, emailFiltro, enderecoFiltro, cidadeFiltro, estadoFiltro, paisFiltro, cepFiltro, foneFiltro);
+            db.Listar(clienteFiltro);
             db.Dispose();
 
             Console.ReadKey();
