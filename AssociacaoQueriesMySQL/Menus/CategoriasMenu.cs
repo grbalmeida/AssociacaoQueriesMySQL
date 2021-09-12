@@ -41,8 +41,14 @@ namespace AssociacaoQueriesMySQL.Menus
         {
             Console.Clear();
 
+            Console.WriteLine("Filtros");
+            Console.Write("Informe o Nome: ");
+            var nomeFiltro = Console.ReadLine();
+
+            Console.Clear();
+
             using var db = new CategoriaRepositorio(_connectionString);
-            db.Listar();
+            db.Listar(nomeFiltro);
             db.Dispose();
 
             Console.ReadKey();

@@ -1,5 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
 using System;
+using System.Text;
 
 namespace AssociacaoQueriesMySQL.Database
 {
@@ -13,11 +14,22 @@ namespace AssociacaoQueriesMySQL.Database
             _conexao.Open();
         }
 
-        public void Listar()
+        public void Listar(string nomeFiltro)
         {
-            var cmdText = "SELECT * FROM Categoria ORDER BY Id ASC";
+            var sql = new StringBuilder();
+            sql.AppendLine("SELECT * FROM Categoria");
+
+            if (!string.IsNullOrEmpty(nomeFiltro))
+                sql.AppendLine("WHERE Nome LIKE @Nome");
+
+            sql.AppendLine("ORDER BY Id ASC");
+
+            var cmdText = sql.ToString();
 
             MySqlCommand comando = new MySqlCommand(cmdText, _conexao);
+
+            if (!string.IsNullOrEmpty(nomeFiltro))
+                comando.Parameters.AddWithValue("@Nome", $"%{nomeFiltro}%");
 
             MySqlDataReader reader = comando.ExecuteReader();
 
