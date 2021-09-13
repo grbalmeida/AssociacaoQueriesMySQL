@@ -1,7 +1,7 @@
-﻿using AssociacaoQueriesMySQL.Core.Extensions;
+﻿using AssociacaoQueriesMySQL.Core.Models;
+using AssociacaoQueriesMySQL.Core.Models.Entities;
 using AssociacaoQueriesMySQL.Core.Models.Filtros;
 using MySql.Data.MySqlClient;
-using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -9,7 +9,7 @@ namespace AssociacaoQueriesMySQL.Database
 {
     public class ProdutoRepositorio : Repositorio
     {
-        public void Listar(ProdutoFiltro filtro)
+        public List<Produto> Listar(ProdutoFiltro filtro)
         {
             var sql = new StringBuilder();
             sql.AppendLine("SELECT p.Id, p.Nome, p.Descricao, p.Ativo, p.Valor,");
@@ -115,44 +115,38 @@ namespace AssociacaoQueriesMySQL.Database
 
             MySqlDataReader reader = comando.ExecuteReader();
 
+            var produtos = new List<Produto>();
+
             if (reader.HasRows)
             {
                 while (reader.Read())
                 {
-                    var id = reader.GetInt32("Id");
-                    var nome = reader.GetString("Nome");
-                    var descricao = reader["Descricao"];
-                    var ativo = reader.GetBoolean("Ativo") ? "S" : "N";
-                    var valor = reader.GetDecimal("Valor");
-                    var quantidadeEstoque = reader.GetInt32("QuantidadeEstoque");
-                    var altura = reader.GetDecimal("Altura");
-                    var largura = reader.GetDecimal("Largura");
-                    var profundidade = reader.GetDecimal("Profundidade");
-                    var categoria = reader.GetString("NomeCategoria");
-
-                    Console.WriteLine($"Id: {id}");
-                    Console.WriteLine($"Nome: {nome}");
-                    Console.WriteLine($"Descrição: {descricao}");
-                    Console.WriteLine($"Ativo: {ativo}");
-                    Console.WriteLine($"Valor: {valor}");
-                    Console.WriteLine($"Quantidade em Estoque: {quantidadeEstoque}");
-                    Console.WriteLine($"Altura: {altura}");
-                    Console.WriteLine($"Dimensões do produto: Largura: {largura} cm / Profundidade: {profundidade} cm / Altura: {altura} cm");
-                    Console.WriteLine($"Categoria: {categoria}");
-                    Console.WriteLine();
+                    produtos.Add(new Produto
+                    {
+                        Id = reader.GetInt32("Id"),
+                        Nome = reader.GetString("Nome"),
+                        Descricao = reader["Descricao"] as string,
+                        Ativo = reader.GetBoolean("Ativo"),
+                        Valor = reader.GetDecimal("Valor"),
+                        QuantidadeEstoque = reader.GetInt32("QuantidadeEstoque"),
+                        Altura = reader.GetDecimal("Altura"),
+                        Largura = reader.GetDecimal("Largura"),
+                        Profundidade = reader.GetDecimal("Profundidade"),
+                        Categoria = new Categoria
+                        {
+                            Nome = reader.GetString("NomeCategoria")
+                        }
+                    });
                 }
-            }
-            else
-            {
-                ConsoleExtensions.Warning("Nenhum produto cadastrado");
-                Console.WriteLine();
             }
 
             comando.Dispose();
             reader.Dispose();
+
+            return produtos;
         }
 
-        public void Inserir(
+        public int Inserir(
             string nome,
             string descricao,
             bool ativo,
@@ -183,58 +177,52 @@ namespace AssociacaoQueriesMySQL.Database
             comando.Parameters.Add(new MySqlParameter("Largura", largura));
             comando.Parameters.Add(new MySqlParameter("Profundidade", profundidade));
 
+            int linhasAfetadas = 0;
+
             try
             {
-                var linhasAfetadas = comando.ExecuteNonQuery();
-
-                if (linhasAfetadas > 0)
-                {
-                    ConsoleExtensions.Success("Produto inserido com sucesso");
-                }
+                linhasAfetadas = comando.ExecuteNonQuery();
             }
             catch (MySqlException e)
             {
                 if (e.Number == (int)MySqlErrorCode.DataTooLong)
                 {
-                    if (e.Message.Contains("Nome")) ConsoleExtensions.Error("O Nome deve possuir no máximo 100 caracteres");
+                    if (e.Message.Contains("Nome")) throw new DbException("O Nome deve possuir no máximo 100 caracteres");
                 }
                 else if (e.Number == (int)MySqlErrorCode.NoReferencedRow2) {
-                    if (e.Message.Contains("FK_Categoria")) ConsoleExtensions.Error("Categoria não existe");
+                    if (e.Message.Contains("FK_Categoria")) throw new DbException("Categoria não existe");
                 }
             }
 
             comando.Dispose();
+
+            return linhasAfetadas;
         }
 
-        public void Remover(int id)
+        public int Remover(int id)
         {
             var cmdText = "DELETE FROM Produto WHERE Id = @Id";
 
             MySqlCommand comando = new(cmdText, _conexao);
             comando.Parameters.Add(new MySqlParameter("Id", id));
 
+            int linhasAfetadas = 0;
+
             try
             {
-                var linhasAfetadas = comando.ExecuteNonQuery();
-
-                if (linhasAfetadas > 0)
-                {
-                    ConsoleExtensions.Success("Produto excluído com sucesso");
-                }
-                else
-                {
-                    ConsoleExtensions.Warning("Produto não existe");
-                }
+                linhasAfetadas = comando.ExecuteNonQuery();
             }
             catch (MySqlException e)
             {
                 if (e.Number == (int)MySqlErrorCode.RowIsReferenced2)
                 {
-                    if (e.Message.Contains("FK_Produto")) ConsoleExtensions.Error("Não é possível excluir esse produto pois existem empréstimos associados a ele");
+                    if (e.Message.Contains("FK_Produto")) throw new DbException("Não é possível excluir esse produto pois existem empréstimos associados a ele");
                 }
             }
 
             comando.Dispose();
+
+            return linhasAfetadas;
         }
     }
 }
