@@ -1,10 +1,12 @@
-﻿namespace AssociacaoQueriesMySQL.Core.Models
+﻿namespace AssociacaoQueriesMySQL.Core.Models.Filtros
 {
-    public class ClienteFiltro
+    public class UsuarioFiltro
     {
         public string Nome { get; set; }
-        public string Documento { get; set; }
+        public string CPF { get; set; }
         public string Email { get; set; }
+        public string DataNascimentoInicial { get; set; }
+        public string DataNascimentoFinal { get; set; }
         public string Endereco { get; set; }
         public string Cidade { get; set; }
         public string Estado { get; set; }

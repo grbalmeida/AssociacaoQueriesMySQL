@@ -1,5 +1,5 @@
 ﻿using AssociacaoQueriesMySQL.Core.Extensions;
-using AssociacaoQueriesMySQL.Core.Models;
+using AssociacaoQueriesMySQL.Core.Models.Filtros;
 using AssociacaoQueriesMySQL.Database;
 using System;
 using System.Collections.Generic;

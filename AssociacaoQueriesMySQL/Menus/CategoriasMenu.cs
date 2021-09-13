@@ -1,4 +1,5 @@
 ﻿using AssociacaoQueriesMySQL.Core.Extensions;
+using AssociacaoQueriesMySQL.Core.Models;
 using AssociacaoQueriesMySQL.Database;
 using System;
 using System.Collections.Generic;
@@ -8,16 +9,17 @@ namespace AssociacaoQueriesMySQL.Menus
     public class CategoriasMenu : IDisposable
     {
         private readonly Action _menuInicial;
-        private readonly CategoriaRepositorio _repo;
+        private CategoriaRepositorio _repo;
 
         public CategoriasMenu(Action menuInicial)
         {
             _menuInicial = menuInicial;
-            _repo = new CategoriaRepositorio();
         }
 
         public void Iniciar()
         {
+            _repo = new CategoriaRepositorio();
+
             Console.Clear();
             Console.WriteLine("1 - Listar Categorias");
             Console.WriteLine("2 - Inserir Categoria");
@@ -45,8 +47,23 @@ namespace AssociacaoQueriesMySQL.Menus
 
             Console.Clear();
             
-            _repo.Listar(nomeFiltro);
+            var categorias = _repo.Listar(nomeFiltro);
             Dispose();
+
+            if (categorias.Count > 0)
+            {
+                foreach (var categoria in categorias)
+                {
+                    Console.WriteLine($"Id: {categoria.Id}");
+                    Console.WriteLine($"Nome: {categoria.Nome}");
+                    Console.WriteLine();
+                }
+            }
+            else
+            {
+                ConsoleExtensions.Warning("Nenhuma categoria cadastrada");
+                Console.WriteLine();
+            }
 
             Console.ReadKey();
             Iniciar();
@@ -60,8 +77,23 @@ namespace AssociacaoQueriesMySQL.Menus
             Console.Write("Informe o Nome: ");
             var nome = Console.ReadLine();
 
-            _repo.Inserir(id, nome);
-            Dispose();
+            try
+            {
+                var linhasAfetadas = _repo.Inserir(id, nome);
+
+                if (linhasAfetadas > 0)
+                {
+                    ConsoleExtensions.Success("Categoria inserida com sucesso");
+                }
+            }
+            catch (DbException e)
+            {
+                ConsoleExtensions.Error(e.Message);
+            }
+            finally
+            {
+                Dispose();
+            }
 
             Console.ReadKey();
             Iniciar();
@@ -73,8 +105,27 @@ namespace AssociacaoQueriesMySQL.Menus
             Console.Write("Informe o Id: ");
             var id = Convert.ToInt32(Console.ReadLine());
 
-            _repo.Remover(id);
-            Dispose();
+            try
+            {
+                var linhasAfetadas = _repo.Remover(id);
+
+                if (linhasAfetadas > 0)
+                {
+                    ConsoleExtensions.Success("Categoria excluída com sucesso");
+                }
+                else
+                {
+                    ConsoleExtensions.Warning("Categoria não existe");
+                }
+            }
+            catch (DbException e)
+            {
+                ConsoleExtensions.Error(e.Message);
+            }
+            finally
+            {
+                Dispose();
+            }
 
             Console.ReadKey();
             Iniciar();

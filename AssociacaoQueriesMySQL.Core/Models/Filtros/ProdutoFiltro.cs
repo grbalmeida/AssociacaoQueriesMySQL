@@ -1,4 +1,4 @@
-﻿namespace AssociacaoQueriesMySQL.Core.Models
+﻿namespace AssociacaoQueriesMySQL.Core.Models.Filtros
 {
     public class ProdutoFiltro
     {

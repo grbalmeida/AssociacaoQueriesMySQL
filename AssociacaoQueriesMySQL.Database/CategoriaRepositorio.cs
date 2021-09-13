@@ -1,13 +1,14 @@
-﻿using AssociacaoQueriesMySQL.Core.Extensions;
+﻿using AssociacaoQueriesMySQL.Core.Models;
+using AssociacaoQueriesMySQL.Core.Models.Entities;
 using MySql.Data.MySqlClient;
-using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace AssociacaoQueriesMySQL.Database
 {
     public class CategoriaRepositorio : Repositorio
     {
-        public void Listar(string nomeFiltro)
+        public List<Categoria> Listar(string nomeFiltro)
         {
             var sql = new StringBuilder();
             sql.AppendLine("SELECT * FROM Categoria");
@@ -26,29 +27,27 @@ namespace AssociacaoQueriesMySQL.Database
 
             MySqlDataReader reader = comando.ExecuteReader();
 
+            var categorias = new List<Categoria>();
+
             if (reader.HasRows)
             {
                 while (reader.Read())
                 {
-                    var id = reader.GetInt32("Id");
-                    var nome = reader.GetString("Nome");
-
-                    Console.WriteLine($"Id: {id}");
-                    Console.WriteLine($"Nome: {nome}");
-                    Console.WriteLine();
+                    categorias.Add(new Categoria
+                    {
+                        Id = reader.GetInt32("Id"),
+                        Nome = reader.GetString("Nome")
+                    });
                 }
-            }
-            else
-            {
-                ConsoleExtensions.Warning("Nenhuma categoria cadastrada");
-                Console.WriteLine();
             }
 
             comando.Dispose();
             reader.Dispose();
+
+            return categorias;
         }
 
-        public void Inserir(int id, string nome)
+        public int Inserir(int id, string nome)
         {
             var cmdText = "INSERT INTO Categoria (Id, Nome) VALUES (@Id, @Nome)";
 
@@ -56,60 +55,54 @@ namespace AssociacaoQueriesMySQL.Database
             comando.Parameters.Add(new MySqlParameter("Id", id));
             comando.Parameters.Add(new MySqlParameter("Nome", nome));
 
+            int linhasAfetadas = 0;
+
             try
             {
-                var linhasAfetadas = comando.ExecuteNonQuery();
-
-                if (linhasAfetadas > 0)
-                {
-                    ConsoleExtensions.Success("Categoria inserida com sucesso");
-                }
+                linhasAfetadas = comando.ExecuteNonQuery();
             }
             catch (MySqlException e)
             {
                 if (e.Number == (int)MySqlErrorCode.DataTooLong)
                 {
-                    if (e.Message.Contains("Nome")) ConsoleExtensions.Error("O Nome deve possuir no máximo 100 caracteres");
+                    if (e.Message.Contains("Nome")) throw new DbException("O Nome deve possuir no máximo 100 caracteres");
                 }
                 else if (e.Number == (int)MySqlErrorCode.DuplicateKeyEntry)
                 {
-                    if (e.Message.Contains("PRIMARY")) ConsoleExtensions.Error("Id já cadastrado");
-                    else if (e.Message.Contains("Nome")) ConsoleExtensions.Error("Nome já cadastrado");
+                    if (e.Message.Contains("PRIMARY")) throw new DbException("Id já cadastrado");
+                    else if (e.Message.Contains("Nome")) throw new DbException("Nome já cadastrado");
                 }
             }
 
             comando.Dispose();
+
+            return linhasAfetadas;
         }
 
-        public void Remover(int id)
+        public int Remover(int id)
         {
             var cmdText = "DELETE FROM Categoria WHERE Id = @Id";
 
             MySqlCommand comando = new(cmdText, _conexao);
             comando.Parameters.Add(new MySqlParameter("Id", id));
 
+            int linhasAfetadas = 0;
+
             try
             {
-                var linhasAfetadas = comando.ExecuteNonQuery();
-
-                if (linhasAfetadas > 0)
-                {
-                    ConsoleExtensions.Success("Categoria excluída com sucesso");
-                }
-                else
-                {
-                    ConsoleExtensions.Warning("Categoria não existe");
-                }
+                linhasAfetadas = comando.ExecuteNonQuery();
             }
             catch (MySqlException e)
             {
                 if (e.Number == (int)MySqlErrorCode.RowIsReferenced2)
                 {
-                    ConsoleExtensions.Error("Não é possível excluir essa categoria pois existem produtos associados a ela");
+                    throw new DbException("Não é possível excluir essa categoria pois existem produtos associados a ela");
                 }
             }
 
             comando.Dispose();
+
+            return linhasAfetadas;
         }
     }
 }
