@@ -1,4 +1,5 @@
 ﻿using AssociacaoQueriesMySQL.Core.Extensions;
+using AssociacaoQueriesMySQL.Core.Models;
 using AssociacaoQueriesMySQL.Core.Models.Filtros;
 using AssociacaoQueriesMySQL.Database;
 using System;
@@ -9,16 +10,17 @@ namespace AssociacaoQueriesMySQL.Menus
     public class UsuariosMenu : IDisposable
     {
         private readonly Action _menuInicial;
-        private readonly UsuarioRepositorio _repo;
+        private UsuarioRepositorio _repo;
 
         public UsuariosMenu(Action menuInicial)
         {
             _menuInicial = menuInicial;
-            _repo = new UsuarioRepositorio();
         }
 
         public void Iniciar()
         {
+            _repo = new UsuarioRepositorio();
+
             Console.Clear();
             Console.WriteLine("1 - Listar Usuários");
             Console.WriteLine("2 - Inserir Usuário");
@@ -81,8 +83,32 @@ namespace AssociacaoQueriesMySQL.Menus
 
             Console.Clear();
 
-            _repo.Listar(usuarioFiltro);
+            var usuarios = _repo.Listar(usuarioFiltro);
             Dispose();
+
+            if (usuarios.Count > 0)
+            {
+                foreach (var usuario in usuarios)
+                {
+                    Console.WriteLine($"Id: {usuario.Id}");
+                    Console.WriteLine($"Nome: {usuario.Nome}");
+                    Console.WriteLine($"CPF: {usuario.CPF}");
+                    Console.WriteLine($"Email: {usuario.Email}");
+                    Console.WriteLine($"Data Nascimento: {usuario.DataNascimento:dd/MM/yyyy}");
+                    Console.WriteLine($"Endereço: {usuario.Endereco}");
+                    Console.WriteLine($"Estado: {usuario.Estado}");
+                    Console.WriteLine($"País: {usuario.Pais}");
+                    Console.WriteLine($"CEP: {usuario.CEP}");
+                    Console.WriteLine($"Fone: {usuario.Fone}");
+                    Console.WriteLine($"Imagem: {usuario.Imagem}");
+                    Console.WriteLine();
+                }
+            }
+            else
+            {
+                ConsoleExtensions.Warning("Nenhum usuário cadastrado");
+                Console.WriteLine();
+            }
 
             Console.ReadKey();
             Iniciar();
@@ -117,8 +143,23 @@ namespace AssociacaoQueriesMySQL.Menus
             Console.Write("Informe a Imagem: ");
             var imagem = Console.ReadLine();
 
-            _repo.Inserir(nome, cpf, email, senha, dataNascimento, endereco, cidade, estado, pais, cep, fone, imagem);
-            Dispose();
+            try
+            {
+                var linhasAfetadas = _repo.Inserir(nome, cpf, email, senha, dataNascimento, endereco, cidade, estado, pais, cep, fone, imagem);
+
+                if (linhasAfetadas > 0)
+                {
+                    ConsoleExtensions.Success("Usuário inserido com sucesso");
+                }
+            }
+            catch (DbException e)
+            {
+                ConsoleExtensions.Error(e.Message);
+            }
+            finally
+            {
+                Dispose();
+            }
 
             Console.ReadKey();
             Iniciar();
@@ -130,8 +171,27 @@ namespace AssociacaoQueriesMySQL.Menus
             Console.Write("Informe o Id: ");
             var id = Convert.ToInt32(Console.ReadLine());
 
-            _repo.Remover(id);
-            Dispose();
+            try
+            {
+                var linhasAfetadas = _repo.Remover(id);
+
+                if (linhasAfetadas > 0)
+                {
+                    ConsoleExtensions.Success("Usuário excluído com sucesso");
+                }
+                else
+                {
+                    ConsoleExtensions.Warning("Usuário não existe");
+                }
+            }
+            catch (DbException e)
+            {
+                ConsoleExtensions.Error(e.Message);
+            }
+            finally
+            {
+                Dispose();
+            }
 
             Console.ReadKey();
             Iniciar();

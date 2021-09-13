@@ -1,7 +1,7 @@
-﻿using AssociacaoQueriesMySQL.Core.Extensions;
+﻿using AssociacaoQueriesMySQL.Core.Models;
+using AssociacaoQueriesMySQL.Core.Models.Entities;
 using AssociacaoQueriesMySQL.Core.Models.Filtros;
 using MySql.Data.MySqlClient;
-using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -9,7 +9,7 @@ namespace AssociacaoQueriesMySQL.Database
 {
     public class UsuarioRepositorio : Repositorio
     {
-        public void Listar(UsuarioFiltro filtro)
+        public List<Usuario> Listar(UsuarioFiltro filtro)
         {
             var sql = new StringBuilder();
             sql.AppendLine("SELECT * FROM Usuario");
@@ -94,47 +94,36 @@ namespace AssociacaoQueriesMySQL.Database
 
             MySqlDataReader reader = comando.ExecuteReader();
 
+            var usuarios = new List<Usuario>();
+
             if (reader.HasRows)
             {
                 while (reader.Read())
                 {
-                    var id = reader.GetInt32("Id");
-                    var nome = reader.GetString("Nome");
-                    var cpf = reader.GetString("CPF");
-                    var email = reader.GetString("Email");
-                    var dataNascimento = reader.GetDateTime("DataNascimento");
-                    var endereco = reader.GetString("Endereco");
-                    var estado = reader.GetString("Estado");
-                    var pais = reader.GetString("Pais");
-                    var cep = reader.GetString("CEP");
-                    var fone = reader.GetString("Fone");
-                    var imagem = reader.GetString("Imagem");
-
-                    Console.WriteLine($"Id: {id}");
-                    Console.WriteLine($"Nome: {nome}");
-                    Console.WriteLine($"CPF: {cpf}");
-                    Console.WriteLine($"Email: {email}");
-                    Console.WriteLine($"Data Nascimento: {dataNascimento:dd/MM/yyyy}");
-                    Console.WriteLine($"Endereço: {endereco}");
-                    Console.WriteLine($"Estado: {estado}");
-                    Console.WriteLine($"País: {pais}");
-                    Console.WriteLine($"CEP: {cep}");
-                    Console.WriteLine($"Fone: {fone}");
-                    Console.WriteLine($"Imagem: {imagem}");
-                    Console.WriteLine();
+                    usuarios.Add(new Usuario
+                    {
+                        Id = reader.GetInt32("Id"),
+                        Nome = reader.GetString("Nome"),
+                        CPF = reader.GetString("CPF"),
+                        Email = reader.GetString("Email"),
+                        DataNascimento = reader.GetDateTime("DataNascimento"),
+                        Endereco = reader.GetString("Endereco"),
+                        Estado = reader.GetString("Estado"),
+                        Pais = reader.GetString("Pais"),
+                        CEP = reader.GetString("CEP"),
+                        Fone = reader.GetString("Fone"),
+                        Imagem = reader.GetString("Imagem")
+                    });
                 }
-            }
-            else
-            {
-                ConsoleExtensions.Warning("Nenhum usuário cadastrado");
-                Console.WriteLine();
             }
 
             comando.Dispose();
             reader.Dispose();
+
+            return usuarios;
         }
 
-        public void Inserir(
+        public int Inserir(
             string nome,
             string cpf,
             string email,
@@ -175,69 +164,63 @@ namespace AssociacaoQueriesMySQL.Database
             comando.Parameters.Add(new MySqlParameter("Fone", fone));
             comando.Parameters.Add(new MySqlParameter("Imagem", imagem));
 
+            int linhasAfetadas = 0;
+
             try
             {
-                var linhasAfetadas = comando.ExecuteNonQuery();
-
-                if (linhasAfetadas > 0)
-                {
-                    ConsoleExtensions.Success("Usuário inserido com sucesso");
-                }
+                linhasAfetadas = comando.ExecuteNonQuery();
             }
             catch (MySqlException e)
             {
                 if (e.Number == (int)MySqlErrorCode.DataTooLong)
                 {
-                    if (e.Message.Contains("Nome")) ConsoleExtensions.Error("O Nome deve possuir no máximo 100 caracteres");
-                    else if (e.Message.Contains("CPF")) ConsoleExtensions.Error("O CPF deve possuir no máximo 11 caracteres");
-                    else if (e.Message.Contains("Email")) ConsoleExtensions.Error("O Email deve possuir no máximo 100 caracteres");
-                    else if (e.Message.Contains("Senha")) ConsoleExtensions.Error("A Senha deve possuir no máximo 100 caracteres");
-                    else if (e.Message.Contains("Endereco")) ConsoleExtensions.Error("O Endereço deve possuir no máximo 100 caracteres");
-                    else if (e.Message.Contains("Cidade")) ConsoleExtensions.Error("A Cidade deve possuir no máximo 100 caracteres");
-                    else if (e.Message.Contains("Estado")) ConsoleExtensions.Error("O Estado deve possuir no máximo 2 caracteres");
-                    else if (e.Message.Contains("Pais")) ConsoleExtensions.Error("O País deve possuir no máximo 100 caracteres");
-                    else if (e.Message.Contains("CEP")) ConsoleExtensions.Error("O CEP deve possuir no máximo 100 caracteres");
-                    else if (e.Message.Contains("Fone")) ConsoleExtensions.Error("O Fone deve possuir no máximo 20 caracteres");
-                    else if (e.Message.Contains("Imagem")) ConsoleExtensions.Error("A imagem deve possuir no máximo 100 caracteres");
+                    if (e.Message.Contains("Nome")) throw new DbException("O Nome deve possuir no máximo 100 caracteres");
+                    else if (e.Message.Contains("CPF")) throw new DbException("O CPF deve possuir no máximo 11 caracteres");
+                    else if (e.Message.Contains("Email")) throw new DbException("O Email deve possuir no máximo 100 caracteres");
+                    else if (e.Message.Contains("Senha")) throw new DbException("A Senha deve possuir no máximo 100 caracteres");
+                    else if (e.Message.Contains("Endereco")) throw new DbException("O Endereço deve possuir no máximo 100 caracteres");
+                    else if (e.Message.Contains("Cidade")) throw new DbException("A Cidade deve possuir no máximo 100 caracteres");
+                    else if (e.Message.Contains("Estado")) throw new DbException("O Estado deve possuir no máximo 2 caracteres");
+                    else if (e.Message.Contains("Pais")) throw new DbException("O País deve possuir no máximo 100 caracteres");
+                    else if (e.Message.Contains("CEP")) throw new DbException("O CEP deve possuir no máximo 100 caracteres");
+                    else if (e.Message.Contains("Fone")) throw new DbException("O Fone deve possuir no máximo 20 caracteres");
+                    else if (e.Message.Contains("Imagem")) throw new DbException("A imagem deve possuir no máximo 100 caracteres");
                 }
                 else if (e.Number == (int)MySqlErrorCode.TruncatedWrongValue)
                 {
-                    if (e.Message.Contains("DataNascimento")) ConsoleExtensions.Error("Data Nascimento em formato inválido");
+                    if (e.Message.Contains("DataNascimento")) throw new DbException("Data Nascimento em formato inválido");
                 }
             }
 
             comando.Dispose();
+
+            return linhasAfetadas;
         }
 
-        public void Remover(int id)
+        public int Remover(int id)
         {
             var cmdText = "DELETE FROM Usuario WHERE Id = @Id";
 
             MySqlCommand comando = new(cmdText, _conexao);
             comando.Parameters.Add(new MySqlParameter("Id", id));
 
+            int linhasAfetadas = 0;
+
             try
             {
-                var linhasAfetadas = comando.ExecuteNonQuery();
-
-                if (linhasAfetadas > 0)
-                {
-                    ConsoleExtensions.Success("Usuário excluído com sucesso");
-                }
-                else
-                {
-                    ConsoleExtensions.Warning("Usuário não existe");
-                }
+                linhasAfetadas = comando.ExecuteNonQuery();
             }
             catch (MySqlException e)
             {
                 if (e.Number == (int)MySqlErrorCode.RowIsReferenced2)
                 {
-                    if (e.Message.Contains("FK_Usuario")) ConsoleExtensions.Error("Não é possível excluir esse usuário pois existem empréstimos associados a ele");
+                    if (e.Message.Contains("FK_Usuario")) throw new DbException("Não é possível excluir esse usuário pois existem empréstimos associados a ele");
                 }
             }
 
             comando.Dispose();
+
+            return linhasAfetadas;
         }
     }
 }
