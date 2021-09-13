@@ -1,4 +1,5 @@
 ﻿using AssociacaoQueriesMySQL.Core.Extensions;
+using AssociacaoQueriesMySQL.Core.Models;
 using AssociacaoQueriesMySQL.Database;
 using System;
 using System.Collections.Generic;
@@ -8,16 +9,17 @@ namespace AssociacaoQueriesMySQL.Menus
     public class EmprestimosMenu : IDisposable
     {
         private readonly Action _menuInicial;
-        private readonly EmprestimoRepositorio _repo;
+        private EmprestimoRepositorio _repo;
 
         public EmprestimosMenu(Action menuInicial)
         {
             _menuInicial = menuInicial;
-            _repo = new EmprestimoRepositorio();
         }
 
         public void Iniciar()
         {
+            _repo = new EmprestimoRepositorio();
+
             Console.Clear();
             Console.WriteLine("1 - Listar Empréstimos");
             Console.WriteLine("2 - Inserir Empréstimo");
@@ -39,8 +41,29 @@ namespace AssociacaoQueriesMySQL.Menus
         {
             Console.Clear();
 
-            _repo.Listar();
+            var emprestimos = _repo.Listar();
             Dispose();
+
+            if (emprestimos.Count > 0)
+            {
+                foreach (var emprestimo in emprestimos)
+                {
+                    Console.WriteLine($"Id: {emprestimo.Id}");
+                    Console.WriteLine($"Data Empréstimo: {emprestimo.DataEmprestimo:dd/MM/yyyy HH:mm:ss}");
+                    Console.WriteLine($"Data Limite Devolução: {emprestimo.DataLimiteDevolucao?.ToString("dd/MM/yyyy HH:mm:ss")}");
+                    Console.WriteLine($"Data Devolução: {emprestimo.DataDevolucao?.ToString("dd/MM/yyyy HH:mm:ss")}");
+                    Console.WriteLine($"Id Empréstimo Anterior: {emprestimo.EmprestimoAnteriorId}");
+                    Console.WriteLine($"Nome Produto: {emprestimo.Produto.Nome}");
+                    Console.WriteLine($"Nome Cliente: {emprestimo.Cliente.Nome}");
+                    Console.WriteLine($"Nome Usuário: {emprestimo.Usuario.Nome}");
+                    Console.WriteLine();
+                }
+            }
+            else
+            {
+                ConsoleExtensions.Warning("Nenhum empréstimo cadastrado");
+                Console.WriteLine();
+            }
 
             Console.ReadKey();
             Iniciar();
@@ -61,8 +84,23 @@ namespace AssociacaoQueriesMySQL.Menus
             Console.Write("Informe a Data Limite de Devolução do Produto (yyyy-MM-dd HH:mm:ss): ");
             var dataLimiteDevolucao = Console.ReadLine();
 
-            _repo.Inserir(produtoId, clienteId, usuarioId, dataEmprestimo, dataLimiteDevolucao);
-            Dispose();
+            try
+            {
+                var linhasAfetadas = _repo.Inserir(produtoId, clienteId, usuarioId, dataEmprestimo, dataLimiteDevolucao);
+
+                if (linhasAfetadas > 0)
+                {
+                    ConsoleExtensions.Success("Empréstimo inserido com sucesso");
+                }
+            }
+            catch (DbException e)
+            {
+                ConsoleExtensions.Error(e.Message);
+            }
+            finally
+            {
+                Dispose();
+            }
 
             Console.ReadKey();
             Iniciar();
@@ -74,8 +112,27 @@ namespace AssociacaoQueriesMySQL.Menus
             Console.Write("Informe o Id: ");
             var id = Convert.ToInt32(Console.ReadLine());
 
-            _repo.Remover(id);
-            Dispose();
+            try
+            {
+                var linhasAfetadas = _repo.Remover(id);
+
+                if (linhasAfetadas > 0)
+                {
+                    ConsoleExtensions.Success("Empréstimo excluído com sucesso");
+                }
+                else
+                {
+                    ConsoleExtensions.Warning("Empréstimo não existe");
+                }
+            }
+            catch (DbException e)
+            {
+                ConsoleExtensions.Error(e.Message);
+            }
+            finally
+            {
+                Dispose();
+            }
 
             Console.ReadKey();
             Iniciar();

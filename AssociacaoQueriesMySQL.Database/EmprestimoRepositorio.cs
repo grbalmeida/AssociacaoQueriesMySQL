@@ -1,13 +1,14 @@
-﻿using AssociacaoQueriesMySQL.Core.Extensions;
+﻿using AssociacaoQueriesMySQL.Core.Models;
+using AssociacaoQueriesMySQL.Core.Models.Entities;
 using MySql.Data.MySqlClient;
-using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace AssociacaoQueriesMySQL.Database
 {
     public class EmprestimoRepositorio : Repositorio
     {
-        public void Listar()
+        public List<Emprestimo> Listar()
         {
             var sql = new StringBuilder();
 
@@ -26,41 +27,42 @@ namespace AssociacaoQueriesMySQL.Database
 
             MySqlDataReader reader = comando.ExecuteReader();
 
+            var emprestimos = new List<Emprestimo>();
+
             if (reader.HasRows)
             {
                 while (reader.Read())
                 {
-                    var id = reader.GetInt32("Id");
-                    var dataEmprestimo = reader.GetDateTime("DataEmprestimo");
-                    DateTime? dataLimiteDevolucao = reader["DataLimiteDevolucao"].ToString() != "" ? reader.GetDateTime("DataLimiteDevolucao") : null;
-                    DateTime? dataDevolucao = reader["DataDevolucao"].ToString() != "" ? reader.GetDateTime("DataDevolucao") : null;
-                    var emprestimoAnteriorId = reader["EmprestimoAnteriorId"];
-                    var nomeProduto = reader.GetString("NomeProduto");
-                    var nomeCliente = reader.GetString("NomeCliente");
-                    var nomeUsuario = reader.GetString("NomeUsuario");
-
-                    Console.WriteLine($"Id: {id}");
-                    Console.WriteLine($"Data Empréstimo: {dataEmprestimo:dd/MM/yyyy HH:mm:ss}");
-                    Console.WriteLine($"Data Limite Devolução: {dataLimiteDevolucao?.ToString("dd/MM/yyyy HH:mm:ss")}");
-                    Console.WriteLine($"Data Devolução: {dataDevolucao?.ToString("dd/MM/yyyy HH:mm:ss")}");
-                    Console.WriteLine($"Id Empréstimo Anterior: {emprestimoAnteriorId}");
-                    Console.WriteLine($"Nome Produto: {nomeProduto}");
-                    Console.WriteLine($"Nome Cliente: {nomeCliente}");
-                    Console.WriteLine($"Nome Usuário: {nomeUsuario}");
-                    Console.WriteLine();
+                    emprestimos.Add(new Emprestimo
+                    {
+                        Id = reader.GetInt32("Id"),
+                        DataEmprestimo = reader.GetDateTime("DataEmprestimo"),
+                        DataLimiteDevolucao = reader["DataLimiteDevolucao"].ToString() != "" ? reader.GetDateTime("DataLimiteDevolucao") : null,
+                        DataDevolucao = reader["DataDevolucao"].ToString() != "" ? reader.GetDateTime("DataDevolucao") : null,
+                        EmprestimoAnteriorId = reader["EmprestimoAnteriorId"].ToString() != "" ? reader.GetInt32("EmprestimoAnteriorId") : null,
+                        Produto = new Produto
+                        {
+                            Nome = reader.GetString("NomeProduto")
+                        },
+                        Cliente = new Cliente
+                        {
+                            Nome = reader.GetString("NomeCliente")
+                        },
+                        Usuario = new Usuario
+                        {
+                            Nome = reader.GetString("NomeUsuario")
+                        }
+                    });
                 }
-            }
-            else
-            {
-                ConsoleExtensions.Warning("Nenhum empréstimo cadastrado");
-                Console.WriteLine();
             }
 
             comando.Dispose();
             reader.Dispose();
+
+            return emprestimos;
         }
 
-        public void Inserir(
+        public int Inserir(
             int produtoId,
             int clienteId,
             int usuarioId,
@@ -83,66 +85,60 @@ namespace AssociacaoQueriesMySQL.Database
             comando.Parameters.Add(new MySqlParameter("DataEmprestimo", dataEmprestimo));
             comando.Parameters.Add(new MySqlParameter("DataLimiteDevolucao", dataLimiteDevolucao));
 
+            int linhasAfetadas = 0;
+
             try
             {
-                var linhasAfetadas = comando.ExecuteNonQuery();
-                
-                if (linhasAfetadas > 0)
-                {
-                    ConsoleExtensions.Success("Empréstimo inserido com sucesso");
-                }
+                linhasAfetadas = comando.ExecuteNonQuery();
             }
             catch (MySqlException e)
             {
                 if (e.Number == (int)MySqlErrorCode.NoReferencedRow2)
                 {
-                    if (e.Message.Contains("FK_Produto")) ConsoleExtensions.Error("Produto não existe");
-                    else if (e.Message.Contains("FK_Cliente")) ConsoleExtensions.Error("Cliente não existe");
-                    else if (e.Message.Contains("FK_Usuario")) ConsoleExtensions.Error("Usuário não existe");
+                    if (e.Message.Contains("FK_Produto")) throw new DbException("Produto não existe");
+                    else if (e.Message.Contains("FK_Cliente")) throw new DbException("Cliente não existe");
+                    else if (e.Message.Contains("FK_Usuario")) throw new DbException("Usuário não existe");
                 }
                 else if (e.Number == (int)MySqlErrorCode.TruncatedWrongValue)
                 {
-                    if (e.Message.Contains("DataEmprestimo")) ConsoleExtensions.Error("Data Empréstimo em formato inválido");
-                    else if (e.Message.Contains("DataLimiteDevolucao")) ConsoleExtensions.Error("Data Limite Devolução em formato inválido");
+                    if (e.Message.Contains("DataEmprestimo")) throw new DbException("Data Empréstimo em formato inválido");
+                    else if (e.Message.Contains("DataLimiteDevolucao")) throw new DbException("Data Limite Devolução em formato inválido");
                 }
                 else
                 {
-                    if (e.Message.Contains("CH_DataLimiteDevolucao")) ConsoleExtensions.Error("A Data Limite Devolução não pode ser menor que a Data Empréstimo");
+                    if (e.Message.Contains("CH_DataLimiteDevolucao")) throw new DbException("A Data Limite Devolução não pode ser menor que a Data Empréstimo");
                 }
             }
 
             comando.Dispose();
+
+            return linhasAfetadas;
         }
 
-        public void Remover(int id)
+        public int Remover(int id)
         {
             var cmdText = "DELETE FROM Emprestimo WHERE Id = @Id";
 
             MySqlCommand comando = new(cmdText, _conexao);
             comando.Parameters.Add(new MySqlParameter("Id", id));
 
+            int linhasAfetadas = 0;
+
             try
             {
-                var linhasAfetadas = comando.ExecuteNonQuery();
-
-                if (linhasAfetadas > 0)
-                {
-                    ConsoleExtensions.Success("Empréstimo excluído com sucesso");
-                }
-                else
-                {
-                    ConsoleExtensions.Warning("Empréstimo não existe");
-                }
+                linhasAfetadas = comando.ExecuteNonQuery();
             }
             catch (MySqlException e)
             {
                 if (e.Number == (int)MySqlErrorCode.RowIsReferenced2)
                 {
-                    if (e.Message.Contains("FK_EmprestimoAnterior")) ConsoleExtensions.Error("Não é possível excluir esse empréstimo pois existem empréstimos associados a ele");
+                    if (e.Message.Contains("FK_EmprestimoAnterior")) throw new DbException("Não é possível excluir esse empréstimo pois existem empréstimos associados a ele");
                 }
             }
 
             comando.Dispose();
+
+            return linhasAfetadas;
         }
     }
 }
